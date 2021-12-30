@@ -31,24 +31,22 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<Absence> absences;
 
-    //Todo: Uncomment when Feedback and Mark are created
-//    @OneToMany(mappedBy = "f_student")
-//    private List<Feedback> feedbacks;
-//
-//    @OneToMany(mappedBy = "m_student")
-//    private List<Mark> marks;
+    @OneToMany(mappedBy = "f_student")
+    private List<Feedback> feedbacks;
+
+    @OneToMany(mappedBy = "m_student")
+    private List<Mark> marks;
 
     //bahti golemiq constructor brat
     public Student(String firstName, String middleName, String lastName,
                    String email, String egn,
-                   String stClass, Integer stClassNum) {
+                   String stClass) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.email = email;
         this.egn = egn;
         this.stClass = stClass;
-        this.stClassNum = stClassNum;
     }
 
     public Student() {
@@ -130,20 +128,19 @@ public class Student {
         this.absences = absences;
     }
 
-    //Todo: Uncomment when Feedback and Mark are created
-//    public List<Feedback> getFeedbacks() {
-//        return feedbacks;
-//    }
-//
-//    public void setFeedbacks(List<Feedback> feedbacks) {
-//        this.feedbacks = feedbacks;
-//    }
-//
-//    public List<Mark> getMarks() {
-//        return marks;
-//    }
-//
-//    public void setMarks(List<Mark> marks) {
-//        this.marks = marks;
-//    }
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
+    }
+
+    public List<Mark> getMarks() {
+        return marks;
+    }
+
+    public void setMarks(List<Mark> marks) {
+        this.marks = marks;
+    }
 }
