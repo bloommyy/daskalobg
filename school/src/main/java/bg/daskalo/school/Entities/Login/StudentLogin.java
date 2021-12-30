@@ -21,6 +21,11 @@ public class StudentLogin {
     public StudentLogin() {
     }
 
+    public StudentLogin(Student student, String password) {
+        this.student = student;
+        this.password = password;
+    }
+
     public Long getId() {
         return id;
     }
