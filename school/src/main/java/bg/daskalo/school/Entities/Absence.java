@@ -8,71 +8,71 @@ public class Absence {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long a_id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private Student a_student;
+    private Student student;
 
-    private Date a_date;
+    private Date date;
 
-    //Todo: Uncomment when Subject class is created
-//    private Subject a_subject;
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
-    private boolean a_isAbsence;
-    private boolean a_isExcused;
+    private boolean isAbsence;
+    private boolean isExcused;
 
     public Absence() {
     }
 
-    public Absence(Student a_student, Date a_date, boolean a_isAbsence) {
-        this.a_student = a_student;
-        this.a_date = a_date;
-        this.a_isAbsence = a_isAbsence;
+    public Absence(Student student, Date date, boolean isAbsence) {
+        this.student = student;
+        this.date = date;
+        this.isAbsence = isAbsence;
     }
 
     public Long getId() {
-        return a_id;
+        return id;
     }
 
     public Student getStudent() {
-        return a_student;
+        return student;
     }
 
-    public void setStudent(Student a_student) {
-        this.a_student = a_student;
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public Date getDate() {
-        return a_date;
+        return date;
     }
 
-    public void setDate(Date a_date) {
-        this.a_date = a_date;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    //Todo: Uncomment when Subject class is created
-//    public Subject getSubject() {
-//        return a_subject;
-//    }
-//
-//    public void setSubject(Subject a_subject) {
-//        this.a_subject = a_subject;
-//    }
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
 
     public boolean isAbsence() {
-        return a_isAbsence;
+        return isAbsence;
     }
 
-    public void setIsAbsence(boolean a_isAbsence) {
-        this.a_isAbsence = a_isAbsence;
+    public void setAbsence(boolean absence) {
+        isAbsence = absence;
     }
 
     public boolean isExcused() {
-        return a_isExcused;
+        return isExcused;
     }
 
-    public void setIsExcused(boolean a_isExcused) {
-        this.a_isExcused = a_isExcused;
+    public void setExcused(boolean excused) {
+        isExcused = excused;
     }
 }

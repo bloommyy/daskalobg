@@ -1,5 +1,7 @@
 package bg.daskalo.school.Entities;
 
+import bg.daskalo.school.Entities.Login.StudentLogin;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -8,139 +10,140 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long st_id;
+    private Long id;
 
-    private String st_first_name;
-    private String st_middle_name;
-    private String st_last_name;
+    @OneToOne
+    private StudentLogin login;
 
-    private String st_email;
-    private String st_password;
-    private String st_egn;
-    private String st_class;
-    private Integer st_class_num;
+    private String firstName;
+    private String middleName;
+    private String lastName;
 
-    @OneToMany(mappedBy = "a_student")
-    private List<Absence> st_absences;
+    @Column(unique = true)
+    private String email;
+
+    @Column(unique = true)
+    private String egn;
+
+    private String stClass;
+    private Integer stClassNum;
+
+    @OneToMany(mappedBy = "student")
+    private List<Absence> absences;
 
     //Todo: Uncomment when Feedback and Mark are created
 //    @OneToMany(mappedBy = "f_student")
-//    private List<Feedback> st_feedbacks;
+//    private List<Feedback> feedbacks;
 //
 //    @OneToMany(mappedBy = "m_student")
-//    private List<Mark> st_marks;
+//    private List<Mark> marks;
 
     //bahti golemiq constructor brat
-    public Student(String st_first_name, String st_middle_name, String st_last_name,
-                   String st_email, String st_password, String st_egn,
-                   String st_class, Integer st_class_num) {
-        this.st_first_name = st_first_name;
-        this.st_middle_name = st_middle_name;
-        this.st_last_name = st_last_name;
-        this.st_email = st_email;
-        this.st_password = st_password;
-        this.st_egn = st_egn;
-        this.st_class = st_class;
-        this.st_class_num = st_class_num;
+    public Student(String firstName, String middleName, String lastName,
+                   String email, String egn,
+                   String stClass, Integer stClassNum) {
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.egn = egn;
+        this.stClass = stClass;
+        this.stClassNum = stClassNum;
     }
 
     public Student() {
     }
 
     public Long getId() {
-        return st_id;
+        return id;
+    }
+
+    public StudentLogin getLogin() {
+        return login;
+    }
+
+    public void setLogin(StudentLogin login) {
+        this.login = login;
     }
 
     public String getFirstName() {
-        return st_first_name;
+        return firstName;
     }
 
-    public void setFirstName(String st_first_name) {
-        this.st_first_name = st_first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getMiddleName() {
-        return st_middle_name;
+        return middleName;
     }
 
-    public void setMiddleName(String st_middle_name) {
-        this.st_middle_name = st_middle_name;
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
     }
 
     public String getLastName() {
-        return st_last_name;
+        return lastName;
     }
 
-    public void setLastName(String st_last_name) {
-        this.st_last_name = st_last_name;
-    }
-
-    public String getFullName(){
-        return st_first_name + " " + st_middle_name + " " + st_last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
-        return st_email;
+        return email;
     }
 
-    public void setEmail(String st_email) {
-        this.st_email = st_email;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getPassword() {
-        return st_password;
+    public String getEgn() {
+        return egn;
     }
 
-    public void setPassword(String st_password) {
-        this.st_password = st_password;
-    }
-
-    public String getEGN() {
-        return st_egn;
-    }
-
-    public void setEGN(String st_egn) {
-        this.st_egn = st_egn;
+    public void setEgn(String egn) {
+        this.egn = egn;
     }
 
     public String getStClass() {
-        return st_class;
+        return stClass;
     }
 
-    public void setStClass(String st_class) {
-        this.st_class = st_class;
+    public void setStClass(String stClass) {
+        this.stClass = stClass;
     }
 
-    public Integer getClassNum() {
-        return st_class_num;
+    public Integer getStClassNum() {
+        return stClassNum;
     }
 
-    public void setClassNum(Integer st_class_num) {
-        this.st_class_num = st_class_num;
+    public void setStClassNum(Integer stClassNum) {
+        this.stClassNum = stClassNum;
     }
 
     public List<Absence> getAbsences() {
-        return st_absences;
+        return absences;
     }
 
-    public void setAbsences(List<Absence> st_absences) {
-        this.st_absences = st_absences;
+    public void setAbsences(List<Absence> absences) {
+        this.absences = absences;
     }
 
     //Todo: Uncomment when Feedback and Mark are created
 //    public List<Feedback> getFeedbacks() {
-//        return st_feedbacks;
+//        return feedbacks;
 //    }
 //
-//    public void setFeedbacks(List<Feedback> st_feedbacks) {
-//        this.st_feedbacks = st_feedbacks;
+//    public void setFeedbacks(List<Feedback> feedbacks) {
+//        this.feedbacks = feedbacks;
 //    }
 //
 //    public List<Mark> getMarks() {
-//        return st_marks;
+//        return marks;
 //    }
 //
-//    public void setMarks(List<Mark> st_marks) {
-//        this.st_marks = st_marks;
+//    public void setMarks(List<Mark> marks) {
+//        this.marks = marks;
 //    }
 }
