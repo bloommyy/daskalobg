@@ -48,21 +48,37 @@ public class Teacher {
         this.t_first_name = t_first_name;
     }
 
-    public String getMiddleName() {return t_middle_name;}
+    public String getMiddleName() {
+        return t_middle_name;
+    }
 
-    public void setMiddleName(String t_middle_name) {this.t_middle_name = t_middle_name; }
+    public void setMiddleName(String t_middle_name) {
+        this.t_middle_name = t_middle_name;
+    }
 
-    public String getLastLame() {return t_last_name; }
+    public String getLastLame() {
+        return t_last_name;
+    }
 
-    public void setLastName(String t_last_name) {this.t_last_name = t_last_name; }
+    public void setLastName(String t_last_name) {
+        this.t_last_name = t_last_name;
+    }
 
-    public String getEmail() {return t_email; }
+    public String getEmail() {
+        return t_email;
+    }
 
-    public void setEmail(String t_email) {this.t_email = t_email; }
+    public void setEmail(String t_email) {
+        this.t_email = t_email;
+    }
 
-    public Integer getSubjectId() {return t_subject_id; }
+    public Integer getSubjectId() {
+        return t_subject_id;
+    }
 
-    public void setSubjectId(Integer t_subject_id) { this.t_subject_id = t_subject_id; }
+    public void setSubjectId(Integer t_subject_id) {
+        this.t_subject_id = t_subject_id;
+    }
 
     public Subject getSubject() {
         return t_subject;
