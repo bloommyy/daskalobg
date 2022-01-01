@@ -4,18 +4,14 @@ import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Student;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
+import bg.daskalo.school.Utils.Security;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -31,25 +27,14 @@ public class StudentController {
         this.studentLoginRepo = studentLoginRepo;
     }
 
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
 
-    private static boolean Validate(String fname,
-                                    String mname,
-                                    String lname,
-                                    String email,
-                                    String egn,
-                                    String password,
-                                    String stClass) {
+    private static boolean validateRegistration(String fname,
+                                                String mname,
+                                                String lname,
+                                                String email,
+                                                String egn,
+                                                String password,
+                                                String stClass) {
 
         if (fname == null ||
                 mname == null ||
@@ -95,7 +80,7 @@ public class StudentController {
                 return false;
         }
 
-        return true;
+        return password.length() >= 8;
     }
 
     @Transactional
@@ -113,19 +98,17 @@ public class StudentController {
             return ResponseEntity.ok("That student is already registered.");
         }
 
-        if (!Validate(fname, mname, lname, email, egn, password, stClass))
+        if (!validateRegistration(fname, mname, lname, email, egn, password, stClass))
             return ResponseEntity.ok("Student wasn't registered: One or more invalid parameters.");
 
-        final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        final byte[] hashbytes = digest.digest(
-                password.getBytes(StandardCharsets.UTF_8));
-        String hashedPass = bytesToHex(hashbytes);
+        String hashedPass = Security.encrypt(password);
 
         st = new Student(fname, mname, lname, email, egn, stClass);
         StudentLogin stLogin = new StudentLogin(st, hashedPass);
 
         try {
             studentRepo.save(st);
+            Test();
             studentLoginRepo.save(stLogin);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -141,5 +124,32 @@ public class StudentController {
         }
 
         return new ResponseEntity<>("Registered new student " + fname + " " + mname.charAt(0) + ". " + lname + "!", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<?> loginStudent(String egn, String password) throws NoSuchAlgorithmException {
+
+        if (egn == null ||
+                password == null)
+            return ResponseEntity.ok("Incorrect EGN or password.");
+
+        if (egn.isEmpty() ||
+                password.isEmpty())
+            return ResponseEntity.ok("Incorrect EGN or password.");
+
+        String hashedPassword = Security.encrypt(password);
+
+        List<StudentLogin> stsLogin = studentLoginRepo.findStudentsLoginByPassword(hashedPassword);
+
+        for (StudentLogin stLog : stsLogin) {
+            if (stLog.getStudent().getEgn().equals(egn))
+                return ResponseEntity.ok("Student found with id:" + stLog.getStudent().getId());
+        }
+
+        return ResponseEntity.ok("Incorrect EGN or password.");
+    }
+
+    private void Test() throws Exception {
+        throw new Exception("test");
     }
 }
