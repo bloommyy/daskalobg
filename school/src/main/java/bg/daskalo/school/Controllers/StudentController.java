@@ -2,6 +2,7 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Student;
+import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
 import bg.daskalo.school.Utils.Security;
@@ -85,30 +86,36 @@ public class StudentController {
 
     @Transactional
     @PostMapping("/register")
-    public ResponseEntity<?> persistStudent(String fname,
-                                            String mname,
-                                            String lname,
-                                            String email,
-                                            String egn,
-                                            String stClass,
-                                            String password) throws NoSuchAlgorithmException {
-        Student st = studentRepo.findStudentByEgn(egn);
+    public ResponseEntity<?> persistStudent(@RequestBody PersistStudentRequest request) throws NoSuchAlgorithmException {
+        Student st = studentRepo.findStudentByEgn(request.getEgn());
 
         if (st != null) {
             return ResponseEntity.ok("That student is already registered.");
         }
 
-        if (!validateRegistration(fname, mname, lname, email, egn, password, stClass))
+        if (!validateRegistration(request.getFirstName(),
+                request.getMiddleName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getEgn(),
+                request.getPassword(),
+                request.getStClass()))
             return ResponseEntity.ok("Student wasn't registered: One or more invalid parameters.");
 
-        String hashedPass = Security.encrypt(password);
+        String hashedPass = Security.encrypt(request.getPassword());
 
-        st = new Student(fname, mname, lname, email, egn, stClass);
+        st = new Student(request.getFirstName(),
+                request.getMiddleName(),
+                request.getLastName(),
+                request.getEmail(),
+                request.getEgn(),
+                request.getStClass());
+
         StudentLogin stLogin = new StudentLogin(st, hashedPass);
 
         try {
             studentRepo.save(st);
-            Test();
+            //Test();
             studentLoginRepo.save(stLogin);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -116,14 +123,15 @@ public class StudentController {
         }
 
         Integer numberInClass = 1;
-        studentRepo.setStudentClassNumToNull(stClass);
-        List<Student> stInClass = studentRepo.fetchSortedStudentsByStClass(stClass);
+        studentRepo.setStudentClassNumToNull(request.getStClass());
+        List<Student> stInClass = studentRepo.fetchSortedStudentsByStClass(request.getStClass());
 
         for (Student student : stInClass) {
             studentRepo.updateStudentClassNum(student.getId(), numberInClass++);
         }
 
-        return new ResponseEntity<>("Registered new student " + fname + " " + mname.charAt(0) + ". " + lname + "!", HttpStatus.CREATED);
+        return new ResponseEntity<>("Registered new student " + st.getFirstName() + " "
+                + st.getMiddleName().charAt(0) + ". " + st.getLastName() + "!", HttpStatus.CREATED);
     }
 
     @GetMapping("/login")
