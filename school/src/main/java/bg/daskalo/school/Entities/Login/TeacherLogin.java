@@ -21,6 +21,11 @@ public class TeacherLogin {
     public TeacherLogin() {
     }
 
+    public TeacherLogin(Teacher teacher, String password) {
+        this.teacher = teacher;
+        this.password = password;
+    }
+
     public Long getId() {
         return id;
     }
