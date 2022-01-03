@@ -6,45 +6,30 @@ import javax.persistence.*;
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long sj_id;
+    private Long id;
 
     @OneToOne
-    @JoinColumn(name = "teacher_id")
-    private Teacher sj_teacher;
+    @JoinColumn(name="teacher_id")
+    private Teacher teacher;
 
+    private String name;
+    private String sjClass;
 
-    private String sj_name;
-    private String sj_class;
-
-
-    public Subject(String sj_name, String sj_class) {
-        this.sj_name = sj_name;
-        this.sj_class = sj_class;
+    public Subject(String name, String sjClass)
+    {
+        this.name = name;
+        this.sjClass = sjClass;
 
     }
-
     public Subject() {
 
     }
 
-    public Long getId() {
-        return sj_id;
-    }
+    public Long getId() {return id; }
 
+    public String getName() {return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getSjName() {
-        return sj_name;
-    }
-
-    public void setSjName(String sj_name) {
-        this.sj_name = sj_name;
-    }
-
-    public String getSjClass() {
-        return sj_class;
-    }
-
-    public void setSjClass(String sj_class) {
-        this.sj_class = sj_class;
-    }
+    public String getSjClass() {return sjClass; }
+    public void setSjClass(String sjClass) {this.sjClass = sjClass; }
 }
