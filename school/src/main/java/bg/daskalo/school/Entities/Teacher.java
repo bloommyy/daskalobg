@@ -14,9 +14,6 @@ public class Teacher {
     private String middleName;
     private String lastName;
 
-    @OneToOne
-    private TeacherLogin login;
-
     private String email;
 
     @OneToOne(mappedBy = "teacher")

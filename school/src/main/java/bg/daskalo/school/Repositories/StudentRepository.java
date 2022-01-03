@@ -16,8 +16,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             , nativeQuery = true)
     List<Student> fetchSortedStudentsByStClass(String stClass);
 
-    Student findStudentByLogin(StudentLogin login);
-
     Student findStudentByFirstNameAndMiddleNameAndLastName(String firstName,
                                                            String middleName,
                                                            String lastName);

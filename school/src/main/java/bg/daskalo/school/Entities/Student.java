@@ -12,8 +12,8 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    private StudentLogin login;
+//    @OneToOne
+//    private StudentLogin login;
 
     private String firstName;
     private String middleName;
@@ -54,14 +54,6 @@ public class Student {
 
     public Long getId() {
         return id;
-    }
-
-    public StudentLogin getLogin() {
-        return login;
-    }
-
-    public void setLogin(StudentLogin login) {
-        this.login = login;
     }
 
     public String getFirstName() {
