@@ -14,6 +14,7 @@ public class Teacher {
     private String middleName;
     private String lastName;
 
+    @Column(unique = true)
     private String email;
 
     @OneToOne(mappedBy = "teacher")
