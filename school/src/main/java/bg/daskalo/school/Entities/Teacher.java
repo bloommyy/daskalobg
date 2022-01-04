@@ -21,11 +21,12 @@ public class Teacher {
     private Subject subject;
 
     public Teacher(String firstName, String middleName, String lastName,
-                   String email) {
+                   String email, Subject subject) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.email = email;
+        this.subject = subject;
     }
 
     public Teacher() {
