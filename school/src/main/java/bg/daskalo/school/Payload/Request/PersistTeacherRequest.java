@@ -1,12 +1,10 @@
 package bg.daskalo.school.Payload.Request;
 
-import bg.daskalo.school.Entities.Subject;
-
 public class PersistTeacherRequest {
     private String firstName;
     private String middleName;
     private String lastName;
-    private String subject;
+    private Long subjectId;
     private String email;
     private String password;
 
@@ -37,12 +35,12 @@ public class PersistTeacherRequest {
         this.lastName = lastName;
     }
 
-    public String getSubject() {
-        return subject;
+    public Long getSubjectId() {
+        return subjectId;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getEmail() {

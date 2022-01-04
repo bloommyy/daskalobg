@@ -2,8 +2,10 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
+import bg.daskalo.school.Entities.Subject;
 import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Payload.Request.PersistTeacherRequest;
+import bg.daskalo.school.Repositories.SubjectRepository;
 import bg.daskalo.school.Repositories.TeacherLoginRepository;
 import bg.daskalo.school.Repositories.TeacherRepository;
 import bg.daskalo.school.Utils.Security;
@@ -23,10 +25,14 @@ import java.util.List;
 public class TeacherController {
     private final TeacherRepository teacherRepo;
     private final TeacherLoginRepository teacherLoginRepo;
+    private final SubjectRepository subjectRepo;
 
-    public TeacherController(TeacherRepository teacherRepo, TeacherLoginRepository teacherLoginRepo) {
+    public TeacherController(TeacherRepository teacherRepo,
+                             TeacherLoginRepository teacherLoginRepo,
+                             SubjectRepository subjectRepo) {
         this.teacherRepo = teacherRepo;
         this.teacherLoginRepo = teacherLoginRepo;
+        this.subjectRepo = subjectRepo;
     }
 
     private static boolean validateRegistration(String fname,
@@ -79,6 +85,10 @@ public class TeacherController {
             return ResponseEntity.ok("That teacher is already registered.");
         }
 
+        Subject tSubject = subjectRepo.findSubjectById(request.getSubjectId());
+        if(tSubject == null)
+            return ResponseEntity.ok("Subject not found.");
+
         if (!validateRegistration(request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
@@ -91,7 +101,8 @@ public class TeacherController {
         t = new Teacher(request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
-                request.getEmail());
+                request.getEmail(),
+                tSubject);
 
         TeacherLogin tLogin = new TeacherLogin(t, hashedPass);
 
