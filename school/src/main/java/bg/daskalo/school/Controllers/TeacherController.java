@@ -9,6 +9,7 @@ import bg.daskalo.school.Repositories.SubjectRepository;
 import bg.daskalo.school.Repositories.TeacherLoginRepository;
 import bg.daskalo.school.Repositories.TeacherRepository;
 import bg.daskalo.school.Utils.Security;
+import bg.daskalo.school.Utils.Validation;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,47 +36,6 @@ public class TeacherController {
         this.subjectRepo = subjectRepo;
     }
 
-    private static boolean validateRegistration(String fname,
-                                                String mname,
-                                                String lname,
-                                                String email,
-                                                String password) {
-
-        if (fname == null ||
-                mname == null ||
-                lname == null ||
-                email == null ||
-                password == null)
-            return false;
-
-        if (fname.isEmpty() ||
-                mname.isEmpty() ||
-                lname.isEmpty() ||
-                email.isEmpty() ||
-                password.isEmpty())
-            return false;
-
-        for (char c : fname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : mname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : lname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        if (!EmailValidator.getInstance(true).isValid(email))
-            return false;
-
-        return password.length() >= 8;
-    }
-
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> persistTeacher(@RequestBody PersistTeacherRequest request) throws NoSuchAlgorithmException {
@@ -89,7 +49,7 @@ public class TeacherController {
         if(tSubject == null)
             return ResponseEntity.ok("Subject not found.");
 
-        if (!validateRegistration(request.getFirstName(),
+        if (!Validation.validateRegistrationTeacher(request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
                 request.getEmail(),

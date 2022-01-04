@@ -6,6 +6,7 @@ import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
 import bg.daskalo.school.Utils.Security;
+import bg.daskalo.school.Utils.Validation;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,62 +29,6 @@ public class StudentController {
         this.studentLoginRepo = studentLoginRepo;
     }
 
-
-    private static boolean validateRegistration(String fname,
-                                                String mname,
-                                                String lname,
-                                                String email,
-                                                String egn,
-                                                String password,
-                                                String stClass) {
-
-        if (fname == null ||
-                mname == null ||
-                lname == null ||
-                email == null ||
-                egn == null ||
-                password == null ||
-                stClass == null)
-            return false;
-
-        if (fname.isEmpty() ||
-                mname.isEmpty() ||
-                lname.isEmpty() ||
-                email.isEmpty() ||
-                egn.isEmpty() ||
-                password.isEmpty() ||
-                stClass.isEmpty())
-            return false;
-
-        for (char c : fname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : mname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : lname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        if (!EmailValidator.getInstance(true).isValid(email))
-            return false;
-
-        if (egn.length() != 10)
-            return false;
-
-        for (char c : egn.toCharArray()) {
-            if (!Character.isDigit(c))
-                return false;
-        }
-
-        return password.length() >= 8;
-    }
-
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> persistStudent(@RequestBody PersistStudentRequest request) throws NoSuchAlgorithmException {
@@ -93,7 +38,7 @@ public class StudentController {
             return ResponseEntity.ok("That student is already registered.");
         }
 
-        if (!validateRegistration(request.getFirstName(),
+        if (!Validation.validateRegistrationStudent(request.getFirstName(),
                 request.getMiddleName(),
                 request.getLastName(),
                 request.getEmail(),
