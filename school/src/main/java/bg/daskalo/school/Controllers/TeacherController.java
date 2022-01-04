@@ -1,8 +1,7 @@
 package bg.daskalo.school.Controllers;
 
+import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
-import bg.daskalo.school.Entities.Student;
-import bg.daskalo.school.Entities.Subject;
 import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Payload.Request.PersistTeacherRequest;
 import bg.daskalo.school.Repositories.TeacherLoginRepository;
@@ -106,5 +105,28 @@ public class TeacherController {
 
         return new ResponseEntity<>("Registered new teacher " + t.getFirstName() + " "
                 + t.getMiddleName().charAt(0) + ". " + t.getLastName() + "!", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<?> loginTeacher(String email, String password) throws NoSuchAlgorithmException {
+
+        if (email == null ||
+                password == null)
+            return ResponseEntity.ok("Incorrect email or password.");
+
+        if (email.isEmpty() ||
+                password.isEmpty())
+            return ResponseEntity.ok("Incorrect email or password.");
+
+        String hashedPassword = Security.encrypt(password);
+
+        List<TeacherLogin> tsLogin = teacherLoginRepo.findTeacherLoginsByPassword(hashedPassword);
+
+        for (TeacherLogin tLog : tsLogin) {
+            if (tLog.getTeacher().getEmail().equals(email))
+                return ResponseEntity.ok("Teacher found with id:" + tLog.getTeacher().getId());
+        }
+
+        return ResponseEntity.ok("Incorrect email or password.");
     }
 }
