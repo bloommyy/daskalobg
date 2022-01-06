@@ -45,16 +45,27 @@ const InnerContainer = styled.div`
     flex-direction: column;
 `;
 
+const AppContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25%;
+`;
 
 export function AccountBox(props){
-    return <BoxContainer>
-        <TopContainer>
-            <HeaderContainer>
-                <HeaderText>Добре дошли!</HeaderText>
-            </HeaderContainer>
-        </TopContainer>
-        <InnerContainer>
-            <LoginForm />
-        </InnerContainer>
-    </BoxContainer>
+    return (<AppContainer>
+        <BoxContainer>
+            <TopContainer>
+                <HeaderContainer>
+                    <HeaderText>Добре дошли!</HeaderText>
+                </HeaderContainer>
+            </TopContainer>
+            <InnerContainer>
+                <LoginForm />
+            </InnerContainer>
+        </BoxContainer>
+    </AppContainer>
+    )
 }

@@ -1,16 +1,19 @@
-import React from 'react'
-import styled from 'styled-components'
+import axios from 'axios';
+import React, { useState } from 'react'
 import { BoxContainer, FormContainer, Input, SubmitButton } from './common'
 
-function btnOnClick(props){
-    
-}
-
 export function LoginForm(props) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    function btnOnClick(){
+        axios.get()
+    }
+
     return <BoxContainer>
         <FormContainer>
-            <Input type="email" placeholder="E-mail" />
-            <Input type="password" placeholder="Парола" />
+            <Input type="email" onChange={e => setEmail(e.target.value)} placeholder="E-mail" />
+            <Input type="password" onChange={e => setPassword(e.target.value)} placeholder="Парола" />
         </FormContainer>
         <SubmitButton type="submit" onClick={btnOnClick}>Влез</SubmitButton>
     </BoxContainer>
