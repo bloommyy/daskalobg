@@ -7,83 +7,81 @@ import java.util.Date;
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long f_id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private Student f_student;
+    private Student student;
 
-    private String f_student_class;
-    private String f_student_class_num;
+    private String studentClass;
+    private String classNum;
 
-    private Date f_date;
+    private Date date;
 
-    private Integer f_subject_id;
-    private String f_description;
+    private Integer subjectId;
+    private String description;
 
-    public Feedback(Student f_student, String f_student_class, String f_student_class_num, Date f_date, Integer f_subject_id, String f_description) {
-        this.f_student = f_student;
-        this.f_student_class = f_student_class;
-        this.f_student_class_num = f_student_class_num;
-        this.f_date = f_date;
-        this.f_subject_id = f_subject_id;
-        this.f_description = f_description;
+    public Feedback(Student student, String studentClass, String classNum, Date date, Integer subjectId, String description) {
+        this.student = student;
+        this.studentClass = studentClass;
+        this.classNum = classNum;
+        this.date = date;
+        this.subjectId = subjectId;
+        this.description = description;
     }
 
     public Feedback() {
     }
 
     public Long getId() {
-        return f_id;
+        return id;
     }
 
     public Student getStudent() {
-        return f_student;
+        return student;
     }
 
-    public void setStudent(Student f_student) {
-        this.f_student = f_student;
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
-    public String getStudenClass() {
-        return f_student_class;
+    public String getStudentClass() {
+        return studentClass;
     }
 
-    public void setStudenClass(String f_student_class) {
-        this.f_student_class = f_student_class;
+    public void setStudentClass(String studentClass) {
+        this.studentClass = studentClass;
     }
 
-    public String getStudenClassNum() {
-        return f_student_class_num;
+    public String getStudentClassNum() {
+        return classNum;
     }
 
-    public void setStudenClassNum(String f_student_class_num) {
-        this.f_student_class_num = f_student_class_num;
+    public void setStudentClassNum(String classNum) {
+        this.classNum = classNum;
     }
 
     public Date getDate() {
-        return f_date;
+        return date;
     }
 
-    public void setDate(Date f_date) {
-        this.f_date = f_date;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Integer getSubjectId() {
-        return f_subject_id;
+        return subjectId;
     }
 
-    public void setSubjectId(Integer f_subject_id) {
-        this.f_subject_id = f_subject_id;
+    public void setSubjectId(Integer subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getDescription() {
-        return f_description;
+        return description;
     }
 
-    public void setDescription(String f_description) {
-        this.f_description = f_description;
-    }
+    public void setDescription(String description) {this.description = description; }
 
 
 }

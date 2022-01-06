@@ -31,10 +31,10 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<Absence> absences;
 
-    @OneToMany(mappedBy = "f_student")
+    @OneToMany(mappedBy = "student")
     private List<Feedback> feedbacks;
 
-    @OneToMany(mappedBy = "m_student")
+    @OneToMany(mappedBy = "student")
     private List<Mark> marks;
 
     //bahti golemiq constructor brat
