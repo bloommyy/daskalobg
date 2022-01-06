@@ -13,20 +13,23 @@ public class Feedback {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
     private String studentClass;
     private String classNum;
 
     private Date date;
 
-    private Integer subjectId;
     private String description;
 
-    public Feedback(Student student, String studentClass, String classNum, Date date, Integer subjectId, String description) {
+    public Feedback(Student student, String studentClass, String classNum, Date date, Subject subject, String description) {
         this.student = student;
         this.studentClass = studentClass;
         this.classNum = classNum;
         this.date = date;
-        this.subjectId = subjectId;
+        this.subject = subject;
         this.description = description;
     }
 
@@ -69,12 +72,12 @@ public class Feedback {
         this.date = date;
     }
 
-    public Integer getSubjectId() {
-        return subjectId;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setSubjectId(Integer subjectId) {
-        this.subjectId = subjectId;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public String getDescription() {

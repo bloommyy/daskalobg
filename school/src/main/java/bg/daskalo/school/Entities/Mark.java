@@ -13,19 +13,22 @@ public class Mark {
     @JoinColumn(name = "student_id")
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
     private String studentClass;
     private String classNum;
 
-    private Integer subjectId;
     private Integer mark;
     private Integer term;
 
 
-    public Mark(Student student, String studentClass, String classNum, Integer subjectId, Integer mark, Integer term) {
+    public Mark(Student student, String studentClass, String classNum, Subject subject, Integer mark, Integer term) {
         this.student = student;
         this.studentClass = studentClass;
         this.classNum = classNum;
-        this.subjectId = subjectId;
+        this.subject = subject;
         this.mark = mark;
         this.term = term;
     }
@@ -59,11 +62,11 @@ public class Mark {
 
     public void setStudentClassNum(String classNum) {this.classNum = classNum; }
 
-    public Integer getSubjectId() {
-        return subjectId;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setSubjectId(Integer subjectId) {this.subjectId = subjectId; }
+    public void setSubject(Subject subject) {this.subject = subject; }
 
     public Integer getMark() {
         return mark;
