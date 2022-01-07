@@ -3,10 +3,10 @@ export const API_SUCCESS = "API_SUCCESS";
 export const API_ERROR = "API_ERROR";
 export const CANCEL_API_REQUEST = "CANCEL_API_REQUEST";
 
-export const apiRequest = ({ url, method }) => {
+export const apiRequest = ({ url, method, data }) => {
     return {
         type: API_REQUEST,
-        meta: { url, method }
+        meta: { url, method, data }
     };
 };
 
