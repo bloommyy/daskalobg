@@ -2,12 +2,12 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
+import bg.daskalo.school.Entities.Mark;
 import bg.daskalo.school.Entities.Subject;
 import bg.daskalo.school.Entities.Teacher;
+import bg.daskalo.school.Entities.Student;
 import bg.daskalo.school.Payload.Request.PersistTeacherRequest;
-import bg.daskalo.school.Repositories.SubjectRepository;
-import bg.daskalo.school.Repositories.TeacherLoginRepository;
-import bg.daskalo.school.Repositories.TeacherRepository;
+import bg.daskalo.school.Repositories.*;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -18,6 +18,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -27,13 +28,25 @@ public class TeacherController {
     private final TeacherRepository teacherRepo;
     private final TeacherLoginRepository teacherLoginRepo;
     private final SubjectRepository subjectRepo;
+    private final MarkRepository markRepo;
+    private final AbsenceRepository absenceRepo;
+    private final FeedbackRepository feedbackRepo;
+    private final StudentRepository studentRepo;
 
     public TeacherController(TeacherRepository teacherRepo,
                              TeacherLoginRepository teacherLoginRepo,
-                             SubjectRepository subjectRepo) {
+                             SubjectRepository subjectRepo,
+                             MarkRepository markRepo,
+                             AbsenceRepository absenceRepo,
+                             FeedbackRepository feedbackRepo,
+                             StudentRepository studentRepo) {
         this.teacherRepo = teacherRepo;
         this.teacherLoginRepo = teacherLoginRepo;
         this.subjectRepo = subjectRepo;
+        this.markRepo = markRepo;
+        this.absenceRepo = absenceRepo;
+        this.feedbackRepo = feedbackRepo;
+        this.studentRepo = studentRepo;
     }
 
     @Transactional
@@ -100,4 +113,39 @@ public class TeacherController {
 
         return ResponseEntity.ok("Incorrect email or password.");
     }
+
+    //adding marks
+
+    @PostMapping("/add/marks")
+    public ResponseEntity<?> addMark(Long stId, Integer mark, Long subjectId, Integer term) {
+        Student student = studentRepo.findStudentById(stId);
+        if(student == null)
+            return ResponseEntity.ok("Student not found.");
+
+        Subject subject = subjectRepo.findSubjectById(subjectId);
+        if(subject == null)
+            return ResponseEntity.ok("Subject not found.");
+
+        if(!Validation.validateTerm(term))
+            return ResponseEntity.ok("Enter a valid term.");
+
+        if(!Validation.validateMark(mark))
+            return ResponseEntity.ok("Enter valid mark!");
+
+        Mark addMark = markRepo.save(new Mark(student, subject, mark, term));
+        return ResponseEntity.ok(mark);
+
+    }
+
+    @DeleteMapping("/delete/marks")
+    public ResponseEntity<?> deleteMark(Student student, Subject subject) {
+        Optional<Mark> deleteMark = markRepo.findMarkByStudentAndAndSubject(student, subject);
+        if(deleteMark.isEmpty())
+            return ResponseEntity.ok("Mark not found!");
+        markRepo.delete(deleteMark.get());
+
+        return ResponseEntity.ok("Mark was delete.");
+
+    }
+
 }
