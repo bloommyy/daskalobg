@@ -1,14 +1,13 @@
 package bg.daskalo.school.Utils;
 
 import org.apache.commons.validator.routines.EmailValidator;
-import org.hibernate.type.descriptor.sql.TinyIntTypeDescriptor;
 
 public class Validation {
     public static boolean validateRegistrationTeacher(String fname,
-                                                       String mname,
-                                                       String lname,
-                                                       String email,
-                                                       String password) {
+                                                      String mname,
+                                                      String lname,
+                                                      String email,
+                                                      String password) {
 
         if (fname == null ||
                 mname == null ||
@@ -101,17 +100,11 @@ public class Validation {
     }
 
     public static boolean validateMark(Integer mark) {
-        if(mark == null ||
-                mark < 2 && mark > 6)
-            return false;
-
-        return true;
+        return mark != null &&
+                (mark >= 2 || mark <= 6);
     }
 
-    public static boolean validateTerm(Integer term)
-    {
-        if(term < 1 && term > 2)
-            return false;
-        return true;
+    public static boolean validateTerm(Integer term) {
+        return term >= 1 && term <= 2;
     }
 }
