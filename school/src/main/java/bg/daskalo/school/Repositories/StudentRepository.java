@@ -34,4 +34,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "where st.stClass = :#{#stClass}")
     void setStudentClassNumToNull(String stClass);
 
+    Student findStudentById(Long id);
+
 }

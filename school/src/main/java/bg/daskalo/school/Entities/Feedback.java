@@ -17,17 +17,12 @@ public class Feedback {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    private String studentClass;
-    private String classNum;
-
     private Date date;
 
     private String description;
 
-    public Feedback(Student student, String studentClass, String classNum, Date date, Subject subject, String description) {
+    public Feedback(Student student, Date date, Subject subject, String description) {
         this.student = student;
-        this.studentClass = studentClass;
-        this.classNum = classNum;
         this.date = date;
         this.subject = subject;
         this.description = description;
@@ -46,22 +41,6 @@ public class Feedback {
 
     public void setStudent(Student student) {
         this.student = student;
-    }
-
-    public String getStudentClass() {
-        return studentClass;
-    }
-
-    public void setStudentClass(String studentClass) {
-        this.studentClass = studentClass;
-    }
-
-    public String getStudentClassNum() {
-        return classNum;
-    }
-
-    public void setStudentClassNum(String classNum) {
-        this.classNum = classNum;
     }
 
     public Date getDate() {

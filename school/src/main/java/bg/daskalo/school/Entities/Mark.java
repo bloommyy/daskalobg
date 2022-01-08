@@ -17,17 +17,12 @@ public class Mark {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    private String studentClass;
-    private String classNum;
-
     private Integer mark;
     private Integer term;
 
 
-    public Mark(Student student, String studentClass, String classNum, Subject subject, Integer mark, Integer term) {
+    public Mark(Student student, Subject subject, Integer mark, Integer term) {
         this.student = student;
-        this.studentClass = studentClass;
-        this.classNum = classNum;
         this.subject = subject;
         this.mark = mark;
         this.term = term;
@@ -47,20 +42,6 @@ public class Mark {
     public void setStudent(Student student) {
         this.student = student;
     }
-
-    public String getStudentClass() {
-        return studentClass;
-    }
-
-    public void setStudentClass(String studentClass) {
-        this.studentClass = studentClass;
-    }
-
-    public String getStudentClassNum() {
-        return classNum;
-    }
-
-    public void setStudentClassNum(String classNum) {this.classNum = classNum; }
 
     public Subject getSubject() {
         return subject;
