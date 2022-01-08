@@ -62,6 +62,6 @@ public class LoginController {
                 return ResponseEntity.ok(tLog.getTeacher());
         }
 
-        return new ResponseEntity<>("Incorrect EGN or password.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Incorrect email or password.", HttpStatus.BAD_REQUEST);
     }
 }
