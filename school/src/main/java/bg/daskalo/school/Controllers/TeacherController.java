@@ -6,6 +6,8 @@ import bg.daskalo.school.Entities.Mark;
 import bg.daskalo.school.Entities.Subject;
 import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Entities.Student;
+import bg.daskalo.school.Entities.Feedback;
+import bg.daskalo.school.Entities.Absence;
 import bg.daskalo.school.Payload.Request.PersistTeacherRequest;
 import bg.daskalo.school.Repositories.*;
 import bg.daskalo.school.Utils.Security;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.List;
+import java.util.Date;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -168,10 +171,10 @@ public class TeacherController {
     
     @DeleteMapping("/delete/feedback")
     public ResponseEntity<?> deleteFeedback(Student student, Subject subject) {
-        Optional<Feedback> deleteFeedback = feedbackRepo.findFeedbackByStudentAndAndSubject(student, subject);
+        Optional<Feedback> deleteFeedback = feedbackRepo.findFeedbackByStudentAndSubject(student, subject);
         if(deleteFeedback.isEmpty())
             return ResponseEntity.ok("Feedback not found!");
-        markRepo.delete(deleteFeedback.get());
+        feedbackRepo.delete(deleteFeedback.get());
 
         return ResponseEntity.ok("Feedback was delete.");
 
@@ -197,7 +200,7 @@ public class TeacherController {
         Optional<Absence> deleteAbsence = absenceRepo.findAbsenceByStudentAndAndSubject(student, subject);
         if(deleteAbsence.isEmpty())
             return ResponseEntity.ok("Absence not found!");
-        markRepo.delete(deleteAbsence.get());
+        absenceRepo.delete(deleteAbsence.get());
 
         return ResponseEntity.ok("Absence was delete.");
 
