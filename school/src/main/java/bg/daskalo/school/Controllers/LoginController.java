@@ -40,11 +40,11 @@ public class LoginController {
 
         if (request.getEmail() == null ||
                 request.getPassword() == null)
-            return new ResponseEntity<>("Incorrect EGN or password.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Incorrect email or password.", HttpStatus.BAD_REQUEST);
 
         if (request.getEmail().isEmpty() ||
                 request.getPassword().isEmpty())
-            return new ResponseEntity<>("Incorrect EGN or password.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Incorrect email or password.", HttpStatus.BAD_REQUEST);
 
         String hashedPassword = Security.encrypt(request.getPassword());
 
