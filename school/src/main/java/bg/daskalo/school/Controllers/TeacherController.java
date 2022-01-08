@@ -147,5 +147,59 @@ public class TeacherController {
         return ResponseEntity.ok("Mark was delete.");
 
     }
+// added feedback/absence methods
+    @PostMapping("/add/feedback")
+    public ResponseEntity<?> addFeedback(Date date, Long subjectId,Long stId ,String description) {
+        Student student = studentRepo.findStudentById(stId);
+        if(student == null)
+            return ResponseEntity.ok("Student not found.");
 
+        Subject subject = subjectRepo.findSubjectById(subjectId);
+        if(subject == null)
+            return ResponseEntity.ok("Subject not found.");
+
+        if(description==null)
+            return ResponseEntity.ok("Enter a valid feedback.");
+
+        Feedback addFeedback = feedbackRepo.save(new Feedback(student, date ,subject, description));
+        return ResponseEntity.ok(description);
+
+    }
+    
+    @DeleteMapping("/delete/feedback")
+    public ResponseEntity<?> deleteFeedback(Student student, Subject subject) {
+        Optional<Feedback> deleteFeedback = feedbackRepo.findFeedbackByStudentAndAndSubject(student, subject);
+        if(deleteFeedback.isEmpty())
+            return ResponseEntity.ok("Feedback not found!");
+        markRepo.delete(deleteFeedback.get());
+
+        return ResponseEntity.ok("Feedback was delete.");
+
+    }
+    
+    @PostMapping("/add/absence")
+    public ResponseEntity<?> addAbsence(Date date,Long subjectId,Long stId, boolean isAbsence) {
+        Student student = studentRepo.findStudentById(stId);
+        if(student == null)
+            return ResponseEntity.ok("Student not found.");
+
+        Subject subject = subjectRepo.findSubjectById(subjectId);
+        if(subject == null)
+            return ResponseEntity.ok("Subject not found.");
+
+        Absence addAbsence = absenceRepo.save(new Absence(student, date ,isAbsence));
+        return ResponseEntity.ok(isAbsence);
+
+    }
+    
+    @DeleteMapping("/delete/absence")
+    public ResponseEntity<?> deleteAbsence(Student student, Subject subject) {
+        Optional<Absence> deleteAbsence = absenceRepo.findAbsenceByStudentAndAndSubject(student, subject);
+        if(deleteAbsence.isEmpty())
+            return ResponseEntity.ok("Absence not found!");
+        markRepo.delete(deleteAbsence.get());
+
+        return ResponseEntity.ok("Absence was delete.");
+
+    }
 }
