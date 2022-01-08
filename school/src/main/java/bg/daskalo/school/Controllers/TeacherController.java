@@ -119,7 +119,7 @@ public class TeacherController {
 
     //adding marks
 
-    @PostMapping("/add/marks")
+    @PostMapping("/add/mark")
     public ResponseEntity<?> addMark(Long stId, Integer mark, Long subjectId, Integer term) {
         Student student = studentRepo.findStudentById(stId);
         if(student == null)
@@ -140,7 +140,7 @@ public class TeacherController {
 
     }
 
-    @DeleteMapping("/delete/marks")
+    @DeleteMapping("/delete/mark")
     public ResponseEntity<?> deleteMark(Student student, Subject subject) {
         Optional<Mark> deleteMark = markRepo.findMarkByStudentAndAndSubject(student, subject);
         if(deleteMark.isEmpty())
