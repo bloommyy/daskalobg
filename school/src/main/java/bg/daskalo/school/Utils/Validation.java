@@ -101,7 +101,7 @@ public class Validation {
 
     public static boolean validateMark(Integer mark) {
         return mark != null &&
-                (mark >= 2 || mark <= 6);
+                (mark >= 2 && mark <= 6);
     }
 
     public static boolean validateTerm(Integer term) {
