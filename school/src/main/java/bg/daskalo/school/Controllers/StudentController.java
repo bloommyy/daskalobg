@@ -2,12 +2,13 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Student;
+import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
+import bg.daskalo.school.Repositories.TeacherRepository;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,20 +24,22 @@ import java.util.List;
 public class StudentController {
     private final StudentRepository studentRepo;
     private final StudentLoginRepository studentLoginRepo;
+    private final TeacherRepository teacherRepo;
 
-    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo) {
+    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo, TeacherRepository teacherRepo) {
         this.studentRepo = studentRepo;
         this.studentLoginRepo = studentLoginRepo;
+        this.teacherRepo = teacherRepo;
     }
 
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> persistStudent(@RequestBody PersistStudentRequest request) throws NoSuchAlgorithmException {
-        Student st = studentRepo.findStudentByEgn(request.getEgn());
+        Student st = studentRepo.findStudentByEmail(request.getEgn());
+        Teacher teacher = teacherRepo.findTeacherByEmail(request.getEmail());
 
-        if (st != null) {
-            return ResponseEntity.ok("That student is already registered.");
-        }
+        if (st != null || teacher != null)
+            return ResponseEntity.ok("That email is already in use.");
 
         if (!Validation.validateRegistrationStudent(request.getFirstName(),
                 request.getMiddleName(),
@@ -60,7 +63,6 @@ public class StudentController {
 
         try {
             studentRepo.save(st);
-            //Test();
             studentLoginRepo.save(stLogin);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -77,32 +79,5 @@ public class StudentController {
 
         return new ResponseEntity<>("Registered new student " + st.getFirstName() + " "
                 + st.getMiddleName().charAt(0) + ". " + st.getLastName() + "!", HttpStatus.CREATED);
-    }
-
-    @GetMapping("/login")
-    public ResponseEntity<?> loginStudent(String egn, String password) throws NoSuchAlgorithmException {
-
-        if (egn == null ||
-                password == null)
-            return ResponseEntity.ok("Incorrect EGN or password.");
-
-        if (egn.isEmpty() ||
-                password.isEmpty())
-            return ResponseEntity.ok("Incorrect EGN or password.");
-
-        String hashedPassword = Security.encrypt(password);
-
-        List<StudentLogin> stsLogin = studentLoginRepo.findStudentsLoginByPassword(hashedPassword);
-
-        for (StudentLogin stLog : stsLogin) {
-            if (stLog.getStudent().getEgn().equals(egn))
-                return ResponseEntity.ok("Student found with id:" + stLog.getStudent().getId());
-        }
-
-        return ResponseEntity.ok("Incorrect EGN or password.");
-    }
-
-    private void Test() throws Exception {
-        throw new Exception("test");
     }
 }

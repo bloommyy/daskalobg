@@ -1,12 +1,9 @@
 package bg.daskalo.school.Controllers;
 
-import bg.daskalo.school.Entities.Mark;
-import bg.daskalo.school.Entities.Student;
 import bg.daskalo.school.Entities.Subject;
-import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Repositories.SubjectRepository;
 import bg.daskalo.school.Repositories.TeacherRepository;
-import bg.daskalo.school.Utils.Validation;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,18 +26,20 @@ public class SubjectController {
     @PostMapping("/add/subject")
     public ResponseEntity<?> addSubject(String name, String sjClass) {
         Optional<Subject> subject = subjectRepo.findSubjectByNameAndSjClass(name, sjClass);
-        if(subject != null)
-            return ResponseEntity.ok("Subject already exists!");
 
-        return ResponseEntity.ok("Subject" + subjectRepo.save(new Subject(name, sjClass)).getName() + "has been added.");
+        if (!subject.isPresent())
+            return new ResponseEntity<>("Subject already exists.", HttpStatus.BAD_REQUEST);
 
+        return new ResponseEntity<>("Subject" + subjectRepo.save(new Subject(name, sjClass)).getName() + "has been added.", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/subject")
     public ResponseEntity<?> deleteSubject(String name, String sjClass) {
         Optional<Subject> deleteSubject = subjectRepo.findSubjectByNameAndSjClass(name, sjClass);
-        if(deleteSubject.isEmpty())
-            return ResponseEntity.ok("Subject not found!");
+
+        if (!deleteSubject.isPresent())
+            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+
         subjectRepo.delete(deleteSubject.get());
 
         return ResponseEntity.ok("Subject was deleted.");
