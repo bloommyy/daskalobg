@@ -1,6 +1,5 @@
 package bg.daskalo.school.Repositories;
 
-import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,11 +15,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             , nativeQuery = true)
     List<Student> fetchSortedStudentsByStClass(String stClass);
 
-    Student findStudentByFirstNameAndMiddleNameAndLastName(String firstName,
-                                                           String middleName,
-                                                           String lastName);
-
-    Student findStudentByEgn(String egn);
+    Student findStudentByEmail(String email);
 
     @Modifying
     @Query("update Student st " +

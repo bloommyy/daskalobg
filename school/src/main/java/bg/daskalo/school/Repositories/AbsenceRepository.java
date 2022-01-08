@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface AbsenceRepository extends JpaRepository<Absence, Long> {
     List<Absence> findAllByStudentAndSubjectOrderByDate(Student student, Subject subject);
+
     Optional<Absence> findAbsenceByStudentAndAndSubject(Student student, Subject subject);
 }

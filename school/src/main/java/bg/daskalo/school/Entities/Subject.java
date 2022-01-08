@@ -9,27 +9,37 @@ public class Subject {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name="teacher_id")
+    @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
     private String name;
     private String sjClass;
 
-    public Subject(String name, String sjClass)
-    {
+    public Subject(String name, String sjClass) {
         this.name = name;
         this.sjClass = sjClass;
-
     }
+
     public Subject() {
-
     }
 
-    public Long getId() {return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() {return name; }
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getSjClass() {return sjClass; }
-    public void setSjClass(String sjClass) {this.sjClass = sjClass; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSjClass() {
+        return sjClass;
+    }
+
+    public void setSjClass(String sjClass) {
+        this.sjClass = sjClass;
+    }
 }
