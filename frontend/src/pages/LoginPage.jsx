@@ -18,7 +18,6 @@ export default connect(({error}) => ({error}), { login })(props => {
             setError("Fields are required");
             return;
           }
-        setError(null);
         props.login({ email, password });
     }
 

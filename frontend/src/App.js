@@ -23,13 +23,13 @@ export default function App() {
     return (
         <Provider store={store}>
             <Router>
-                <div className='container'>
+                <div>
                     <Switch>
                         <AuthRoute path='/login' type='guest'>
                             <LoginPage />
                         </AuthRoute>
                         <AuthRoute path='/home' isAuthUser={true} type="private" >
-                            <div>you're in home rn</div>
+                            <HomePage />
                         </AuthRoute>
                         <AuthRoute path='/my-account' type='private'>
                             <MyAccount />

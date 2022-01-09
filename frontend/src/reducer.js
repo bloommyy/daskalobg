@@ -12,7 +12,6 @@ export default (
 ) => {
     switch (action.type) {
         case API_SUCCESS:
-            console.log(action)
             localStorage.setItem("user", JSON.stringify(action.payload));
             return { ...state, isAuthUser: true, user: action.payload };
         case API_ERROR:

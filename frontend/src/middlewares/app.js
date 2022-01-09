@@ -1,14 +1,10 @@
 import { apiRequest } from "../actions/api";
 import { LOGIN } from "../actions/auth";
 
-const SERVER_URL = `http://localhost:8080`;
+const SERVER_URL = `http://192.168.1.105:8080`;
 
 export const appMiddleware = () => next => action => {
     next(action);
-
-    console.log(action.type)
-    console.log(action)
-
     switch (action.type) {
         case LOGIN: {
             next(
