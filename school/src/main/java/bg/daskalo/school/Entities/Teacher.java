@@ -1,6 +1,7 @@
 package bg.daskalo.school.Entities;
 
 import bg.daskalo.school.Entities.Login.TeacherLogin;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -8,7 +9,8 @@ import java.util.UUID;
 @Entity
 public class Teacher {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
     private String firstName;
@@ -22,7 +24,7 @@ public class Teacher {
 
     public Teacher(String firstName, String middleName, String lastName,
                    String email, Subject subject) {
-        this.id = UUID.randomUUID();
+        //this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;

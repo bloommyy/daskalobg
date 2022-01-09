@@ -2,17 +2,14 @@ package bg.daskalo.school.Entities.Login;
 
 import bg.daskalo.school.Entities.Student;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 public class StudentLogin {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @MapsId
     @OneToOne
     private Student student;
 

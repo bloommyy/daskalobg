@@ -5,7 +5,7 @@ import bg.daskalo.school.Entities.Student;
 import java.util.UUID;
 
 public class StudentLoginResponse {
-    private UUID guid;
+    private UUID uuid;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -15,7 +15,7 @@ public class StudentLoginResponse {
     private Integer stClassNum;
 
     public StudentLoginResponse(Student st) {
-        this.guid = st.getId();
+        this.uuid = st.getId();
         this.firstName = st.getFirstName();
         this.middleName = st.getMiddleName();
         this.lastName = st.getLastName();
@@ -25,8 +25,8 @@ public class StudentLoginResponse {
         this.stClassNum = st.getStClassNum();
     }
 
-    public UUID getGuid() {
-        return guid;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String getFirstName() {

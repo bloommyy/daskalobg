@@ -1,6 +1,7 @@
 package bg.daskalo.school.Entities;
 
 import bg.daskalo.school.Entities.Login.StudentLogin;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.UUID;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID id;
 
     private String firstName;
@@ -35,11 +37,10 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<Mark> marks;
 
-    //bahti golemiq constructor brat
     public Student(String firstName, String middleName, String lastName,
                    String email, String egn,
                    String stClass) {
-        this.id = UUID.randomUUID();
+        //this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
