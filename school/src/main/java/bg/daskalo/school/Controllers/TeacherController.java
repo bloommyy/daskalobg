@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -88,7 +89,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/mark")
-    public ResponseEntity<?> addMark(Long stId, Integer mark, Long teacherId, Integer term) {
+    public ResponseEntity<?> addMark(UUID stId, Integer mark, UUID teacherId, Integer term) {
         Student student = studentRepo.findStudentById(stId);
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
@@ -124,7 +125,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/feedback")
-    public ResponseEntity<?> addFeedback(Long subjectId, Long stId, String description) {
+    public ResponseEntity<?> addFeedback(Long subjectId, UUID stId, String description) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 
@@ -154,7 +155,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/absence")
-    public ResponseEntity<?> addAbsence(Long subjectId, Long stId, boolean isAbsence) {
+    public ResponseEntity<?> addAbsence(Long subjectId, UUID stId, boolean isAbsence) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 

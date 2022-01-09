@@ -3,6 +3,7 @@ package bg.daskalo.school.Controllers;
 import bg.daskalo.school.Entities.Login.StudentLogin;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
 import bg.daskalo.school.Payload.Request.LoginRequest;
+import bg.daskalo.school.Payload.Response.StudentLoginResponse;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
 import bg.daskalo.school.Repositories.TeacherLoginRepository;
@@ -52,7 +53,7 @@ public class LoginController {
 
         for (StudentLogin stLog : stsLogin) {
             if (stLog.getStudent().getEmail().equals(request.getEmail()))
-                return ResponseEntity.ok(stLog.getStudent());
+                return ResponseEntity.ok(new StudentLoginResponse(stLog.getStudent()));
         }
 
         List<TeacherLogin> tsLogin = teacherLoginRepo.findTeacherLoginsByPassword(hashedPassword);

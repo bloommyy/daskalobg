@@ -4,16 +4,14 @@ import bg.daskalo.school.Entities.Login.StudentLogin;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-//    @OneToOne
-//    private StudentLogin login;
+    private UUID id;
 
     private String firstName;
     private String middleName;
@@ -41,6 +39,7 @@ public class Student {
     public Student(String firstName, String middleName, String lastName,
                    String email, String egn,
                    String stClass) {
+        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -52,7 +51,7 @@ public class Student {
     public Student() {
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

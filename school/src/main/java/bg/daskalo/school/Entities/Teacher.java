@@ -3,19 +3,17 @@ package bg.daskalo.school.Entities;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     private String firstName;
     private String middleName;
     private String lastName;
-
-    @OneToOne
-    private TeacherLogin login;
 
     private String email;
 
@@ -24,6 +22,7 @@ public class Teacher {
 
     public Teacher(String firstName, String middleName, String lastName,
                    String email, Subject subject) {
+        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -35,7 +34,7 @@ public class Teacher {
 
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -75,7 +74,7 @@ public class Teacher {
         return subject;
     }
 
-    public void setSubject(Subject t_subject) {
+    public void setSubject(Subject subject) {
         this.subject = subject;
     }
 }
