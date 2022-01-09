@@ -1,8 +1,7 @@
 package bg.daskalo.school.Controllers;
 
+import bg.daskalo.school.Entities.*;
 import bg.daskalo.school.Entities.Login.StudentLogin;
-import bg.daskalo.school.Entities.Student;
-import bg.daskalo.school.Entities.Teacher;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -79,5 +79,41 @@ public class StudentController {
 
         return new ResponseEntity<>("Registered new student " + st.getFirstName() + " "
                 + st.getMiddleName().charAt(0) + ". " + st.getLastName() + "!", HttpStatus.CREATED);
+    }
+
+    @GetMapping("/marks")
+    public ResponseEntity<?> getMarks(UUID stId) {
+        Student st = studentRepo.findStudentById(stId);
+
+        if(st == null)
+            return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
+
+        List<Mark> marks = st.getMarks();
+
+        return ResponseEntity.ok(marks);
+    }
+
+    @GetMapping("/absences")
+    public ResponseEntity<?> getAbsences(UUID stId) {
+        Student st = studentRepo.findStudentById(stId);
+
+        if(st == null)
+            return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
+
+        List<Absence> absences = st.getAbsences();
+
+        return ResponseEntity.ok(absences);
+    }
+
+    @GetMapping("/feedbacks")
+    public ResponseEntity<?> getFeedbacks(UUID stId) {
+        Student st = studentRepo.findStudentById(stId);
+
+        if(st == null)
+            return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
+
+        List<Feedback> feedbacks = st.getFeedbacks();
+
+        return ResponseEntity.ok(feedbacks);
     }
 }

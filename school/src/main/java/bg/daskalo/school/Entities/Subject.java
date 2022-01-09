@@ -42,4 +42,12 @@ public class Subject {
     public void setSjClass(String sjClass) {
         this.sjClass = sjClass;
     }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
 }
