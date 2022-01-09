@@ -13,12 +13,13 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/teachers")
+@RequestMapping("/teacher")
 public class TeacherController {
     private final TeacherRepository teacherRepo;
     private final TeacherLoginRepository teacherLoginRepo;
@@ -87,14 +88,15 @@ public class TeacherController {
     }
 
     @PostMapping("/add/mark")
-    public ResponseEntity<?> addMark(Long stId, Integer mark, Long subjectId, Integer term) {
+    public ResponseEntity<?> addMark(Long stId, Integer mark, Long teacherId, Integer term) {
         Student student = studentRepo.findStudentById(stId);
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
         if (student == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
-        Subject subject = subjectRepo.findSubjectById(subjectId);
-        if (subject == null)
-            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+        if (teacher == null)
+            return new ResponseEntity<>("Teacher not found.", HttpStatus.BAD_REQUEST);
 
         if (!Validation.validateTerm(term))
             return new ResponseEntity<>("Term is invalid.", HttpStatus.BAD_REQUEST);
@@ -102,9 +104,11 @@ public class TeacherController {
         if (!Validation.validateMark(mark))
             return new ResponseEntity<>("Mark is invalid.", HttpStatus.BAD_REQUEST);
 
-        Mark addMark = markRepo.save(new Mark(student, subject, mark, term));
-        return new ResponseEntity<>(addMark, HttpStatus.CREATED);
-
+        Mark addMark = markRepo.save(new Mark(student, teacher.getSubject(), mark, term));
+        return new ResponseEntity<>("Added mark " + addMark.getMark() +
+                " to " + addMark.getStudent().getFirstName()
+                + " " + addMark.getStudent().getMiddleName().charAt(0) + ". " +
+                addMark.getStudent().getLastName(), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/mark")
@@ -120,7 +124,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/feedback")
-    public ResponseEntity<?> addFeedback(Date date, Long subjectId, Long stId, String description) {
+    public ResponseEntity<?> addFeedback(Long subjectId, Long stId, String description) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 
@@ -133,13 +137,13 @@ public class TeacherController {
         if (description == null)
             return new ResponseEntity<>("Enter a valid feedback.", HttpStatus.BAD_REQUEST);
 
-        Feedback addFeedback = feedbackRepo.save(new Feedback(student, date, subject, description));
-        return new ResponseEntity<>(addFeedback, HttpStatus.CREATED);
+        Feedback addFeedback = feedbackRepo.save(new Feedback(student, new Date(), subject, description));
+        return new ResponseEntity<>("Feedback : " + addFeedback.getDescription() + " saved successfully.", HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/feedback")
-    public ResponseEntity<?> deleteFeedback(Student student, Subject subject) {
-        Optional<Feedback> deleteFeedback = feedbackRepo.findFeedbackByStudentAndSubject(student, subject);
+    public ResponseEntity<?> deleteFeedback(Long id) {
+        Optional<Feedback> deleteFeedback = feedbackRepo.findFeedbackById(id);
 
         if (!deleteFeedback.isPresent())
             return new ResponseEntity<>("Feedback not found.", HttpStatus.BAD_REQUEST);
@@ -150,7 +154,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/absence")
-    public ResponseEntity<?> addAbsence(Date date, Long subjectId, Long stId, boolean isAbsence) {
+    public ResponseEntity<?> addAbsence(Long subjectId, Long stId, boolean isAbsence) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 
@@ -160,14 +164,27 @@ public class TeacherController {
         if (subject == null)
             return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
 
-        Absence addAbsence = absenceRepo.save(new Absence(student, date, isAbsence));
-        return new ResponseEntity<>(addAbsence, HttpStatus.CREATED);
+        Absence addAbsence = absenceRepo.save(new Absence(student, new Date(), isAbsence, subject));
+        return new ResponseEntity<>("Absence given to " + addAbsence.getStudent().getFirstName() + ".", HttpStatus.CREATED);
+    }
 
+    @PostMapping("/excuse/absence")
+    public ResponseEntity<?> excuseAbsence(Long id){
+        Optional<Absence> excuseAbsence = absenceRepo.findAbsenceById(id);
+
+        if(!excuseAbsence.isPresent())
+            return new ResponseEntity<>("Absence not found.", HttpStatus.BAD_REQUEST);
+
+        excuseAbsence.get().setExcused(true);
+
+        absenceRepo.save(excuseAbsence.get());
+
+        return ResponseEntity.ok("Excused absence on date " + excuseAbsence.get().getDate() + ".");
     }
 
     @DeleteMapping("/delete/absence")
-    public ResponseEntity<?> deleteAbsence(Student student, Subject subject) {
-        Optional<Absence> deleteAbsence = absenceRepo.findAbsenceByStudentAndAndSubject(student, subject);
+    public ResponseEntity<?> deleteAbsence(Long id) {
+        Optional<Absence> deleteAbsence = absenceRepo.findAbsenceById(id);
 
         if (!deleteAbsence.isPresent())
             return new ResponseEntity<>("Absence not found.", HttpStatus.BAD_REQUEST);

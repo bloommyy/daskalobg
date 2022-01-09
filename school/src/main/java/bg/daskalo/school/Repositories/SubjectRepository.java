@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
+
     List<Subject> findAllBySjClass(String sjClass);
 
     Subject findSubjectById(Long id);

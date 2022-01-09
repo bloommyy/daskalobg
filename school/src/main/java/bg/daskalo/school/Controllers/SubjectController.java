@@ -24,17 +24,17 @@ public class SubjectController {
         this.teacherRepo = teacherRepo;
     }
 
-    @PostMapping("/add/subject")
+    @PostMapping("/add")
     public ResponseEntity<?> addSubject(String name, String sjClass) {
         Optional<Subject> subject = subjectRepo.findSubjectByNameAndSjClass(name, sjClass);
 
         if (subject.isPresent())
             return new ResponseEntity<>("Subject already exists.", HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>("Subject" + subjectRepo.save(new Subject(name, sjClass)).getName() + "has been added.", HttpStatus.CREATED);
+        return new ResponseEntity<>("Subject " + subjectRepo.save(new Subject(name, sjClass)).getName() + " has been added.", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/delete/subject")
+    @DeleteMapping("/delete")
     public ResponseEntity<?> deleteSubject(String name, String sjClass) {
         Optional<Subject> deleteSubject = subjectRepo.findSubjectByNameAndSjClass(name, sjClass);
 

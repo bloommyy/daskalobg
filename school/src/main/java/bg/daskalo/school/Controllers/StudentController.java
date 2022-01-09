@@ -35,7 +35,7 @@ public class StudentController {
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> persistStudent(@RequestBody PersistStudentRequest request) throws NoSuchAlgorithmException {
-        Student st = studentRepo.findStudentByEmail(request.getEgn());
+        Student st = studentRepo.findStudentByEmail(request.getEmail());
         Teacher teacher = teacherRepo.findTeacherByEmail(request.getEmail());
 
         if (st != null || teacher != null)
