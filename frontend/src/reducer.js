@@ -5,7 +5,6 @@ export default (
     state = {
         isAuthUser: !!localStorage.getItem("user"),
         user: JSON.parse(localStorage.getItem("user")) || {},
-        isLoading: false,
         error: null
     },
     action
