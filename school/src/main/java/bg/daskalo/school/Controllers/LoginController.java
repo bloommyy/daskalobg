@@ -49,18 +49,18 @@ public class LoginController {
 
         String hashedPassword = Security.encrypt(request.getPassword());
 
-        List<StudentLogin> stsLogin = studentLoginRepo.findStudentsLoginByPassword(hashedPassword);
-
-        for (StudentLogin stLog : stsLogin) {
-            if (stLog.getStudent().getEmail().equals(request.getEmail()))
-                return ResponseEntity.ok(new StudentLoginResponse(stLog.getStudent()));
-        }
-
         List<TeacherLogin> tsLogin = teacherLoginRepo.findTeacherLoginsByPassword(hashedPassword);
 
         for (TeacherLogin tLog : tsLogin) {
             if (tLog.getTeacher().getEmail().equals(request.getEmail()))
                 return ResponseEntity.ok(tLog.getTeacher());
+        }
+
+        List<StudentLogin> stsLogin = studentLoginRepo.findStudentsLoginByPassword(hashedPassword);
+
+        for (StudentLogin stLog : stsLogin) {
+            if (stLog.getStudent().getEmail().equals(request.getEmail()))
+                return ResponseEntity.ok(new StudentLoginResponse(stLog.getStudent()));
         }
 
         return new ResponseEntity<>("Incorrect email or password.", HttpStatus.BAD_REQUEST);

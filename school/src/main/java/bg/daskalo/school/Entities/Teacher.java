@@ -25,7 +25,6 @@ public class Teacher {
 
     public Teacher(String firstName, String middleName, String lastName,
                    String email, Subject subject) {
-        //this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;

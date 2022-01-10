@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
@@ -28,8 +29,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("update Student st " +
             "set st.stClassNum = null " +
             "where st.stClass = :#{#stClass}")
-    void setStudentClassNumToNull(String stClass);
+    void setStudentsClassNumToNull(String stClass);
 
     Student findStudentById(UUID id);
 
+    Set<Student> findStudentsByStClass(String stClass);
 }

@@ -1,6 +1,5 @@
 package bg.daskalo.school.Entities;
 
-import bg.daskalo.school.Entities.Login.StudentLogin;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -40,7 +39,6 @@ public class Student {
     public Student(String firstName, String middleName, String lastName,
                    String email, String egn,
                    String stClass) {
-        //this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;

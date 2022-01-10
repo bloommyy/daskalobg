@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -64,21 +65,22 @@ public class StudentController {
         try {
             studentRepo.save(st);
             studentLoginRepo.save(stLogin);
+
+            Integer numberInClass = 1;
+            studentRepo.setStudentsClassNumToNull(request.getStClass());
+
+            List<Student> stInClass = studentRepo.fetchSortedStudentsByStClass(request.getStClass());
+
+            for (Student student : stInClass) {
+                studentRepo.updateStudentClassNum(student.getId(), numberInClass++);
+            }
+
+            return new ResponseEntity<>("Registered new student " + st.getFirstName() + " "
+                    + st.getMiddleName().charAt(0) + ". " + st.getLastName() + "!", HttpStatus.CREATED);
         } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ResponseEntity.ok("An error occurred and the student wasn't registered!");
         }
-
-        Integer numberInClass = 1;
-        studentRepo.setStudentClassNumToNull(request.getStClass());
-        List<Student> stInClass = studentRepo.fetchSortedStudentsByStClass(request.getStClass());
-
-        for (Student student : stInClass) {
-            studentRepo.updateStudentClassNum(student.getId(), numberInClass++);
-        }
-
-        return new ResponseEntity<>("Registered new student " + st.getFirstName() + " "
-                + st.getMiddleName().charAt(0) + ". " + st.getLastName() + "!", HttpStatus.CREATED);
     }
 
     @GetMapping("/marks")
@@ -115,5 +117,15 @@ public class StudentController {
         List<Feedback> feedbacks = st.getFeedbacks();
 
         return ResponseEntity.ok(feedbacks);
+    }
+
+    @GetMapping("/byClass")
+    public ResponseEntity<?> getStudentsByClass(String stClass){
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        if(students != null & students.isEmpty())
+            return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity.ok(students);
     }
 }

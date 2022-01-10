@@ -23,20 +23,10 @@ public class Validation {
                 password.isEmpty())
             return false;
 
-        for (char c : fname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : mname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : lname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
+        if (!validateName(fname) ||
+                !validateName(mname) ||
+                !validateName(lname))
+            return false;
 
         if (!EmailValidator.getInstance(true).isValid(email))
             return false;
@@ -70,20 +60,10 @@ public class Validation {
                 stClass.isEmpty())
             return false;
 
-        for (char c : fname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : mname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
-
-        for (char c : lname.toCharArray()) {
-            if (!Character.isLetter(c))
-                return false;
-        }
+        if (!validateName(fname) ||
+                !validateName(mname) ||
+                !validateName(lname))
+            return false;
 
         if (!EmailValidator.getInstance(true).isValid(email))
             return false;
@@ -96,6 +76,20 @@ public class Validation {
                 return false;
         }
 
+        if (stClass.length() == 2) {
+            if (!Character.isDigit(stClass.charAt(0)))
+                return false;
+
+            if (!Character.isLetter(stClass.charAt(1)))
+                return false;
+        } else if (stClass.length() == 3) {
+            if (!Character.isDigit(stClass.charAt(0)) || !Character.isDigit(stClass.charAt(1)))
+                return false;
+
+            if (!Character.isLetter(stClass.charAt(2)))
+                return false;
+        }
+
         return password.length() >= 8;
     }
 
@@ -105,6 +99,15 @@ public class Validation {
     }
 
     public static boolean validateTerm(Integer term) {
-        return term >= 1 && term <= 2;
+        return (term >= 1 && term <= 2);
+    }
+
+    public static boolean validateName(String name) {
+        for (char c : name.toCharArray()) {
+            if (!Character.isLetter(c))
+                return false;
+        }
+
+        return true;
     }
 }
