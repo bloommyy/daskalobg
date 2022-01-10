@@ -1,4 +1,4 @@
-import Nav from '../components/AppNavBar';
+import Nav from '../components/TeacherAppNavBar';
 import { Button, Form, TeacherButton } from '../components/HomePageCSS';
 import { GetStudentsTable, GetAbsencesTable, GetFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
@@ -13,10 +13,21 @@ export function TeacherHomePage() {
     const [GradesData, setGradesData] = useState('');
     const [AbsencesData, setAbsencesData] = useState('');
     const [FeedbacksData, setFeedbacksData] = useState('');
-    const [SubjectsData, setSubjectsData] = useState(null);
+    const [Classes, setClasses] = useState(null);
 
     useEffect(() => {
-
+        if (Classes === null)
+            axios.get('http://localhost:8080/teacher/classes')
+                .then(function (response) {
+                    if (typeof response.data === 'undefined')
+                        return;
+                    setClasses(response.data);
+                    console.log(response.data)
+                })
+                .catch(function (error) {
+                    alert(error)
+                    return;
+                })
     })
 
     function onGrades() {
@@ -68,7 +79,7 @@ export function TeacherHomePage() {
 
     return (
         <Form>
-            <Nav />
+            <Nav classes={Classes} />
             <Button onClick={onGrades} width='24.2%' selected={Grades}>Оценки</Button>
             <Button onClick={onAbsences} width='24.2%' selected={Absences}>Отсъствия</Button>
             <Button onClick={onFeedback} width='24.2%' selected={Feedbacks}>Забележки</Button>

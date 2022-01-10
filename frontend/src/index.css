@@ -20,3 +20,21 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.dropdown {
+  margin-right: 10px;
+}
+
+.dropdownToggle.dropdown-toggle.btn.btn-secondary {
+  background-color: black;
+}
+
+.dropdown-menu.show {
+  background-color: rgb(55, 60, 65);
+  color: white;
+  transform: translate3d(-34px, 36px, 0px);
+}
+
+.ddItem.dropdown-item {
+  color: white;
+}

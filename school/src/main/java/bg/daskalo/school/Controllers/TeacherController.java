@@ -13,9 +13,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -170,7 +168,7 @@ public class TeacherController {
     }
 
     @PostMapping("/absence/excuse")
-    public ResponseEntity<?> excuseAbsence(Long id){
+    public ResponseEntity<?> excuseAbsence(Long id) {
         Absence excuseAbsence = absenceRepo.findAbsenceById(id);
 
         if (excuseAbsence == null)
@@ -196,5 +194,10 @@ public class TeacherController {
         absenceRepo.delete(deleteAbsence);
 
         return ResponseEntity.ok("Absence was deleted.");
+    }
+
+    @GetMapping("/classes")
+    public ResponseEntity<?> getAllClasses() {
+        return ResponseEntity.ok(teacherRepo.fetchAllClasses());
     }
 }

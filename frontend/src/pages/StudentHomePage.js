@@ -1,4 +1,4 @@
-import Nav from '../components/AppNavBar';
+import Nav from '../components/StudentAppNavBar';
 import { Button, Form } from '../components/HomePageCSS';
 import { GetMarksTable, GetAbsencesTable, GetFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
