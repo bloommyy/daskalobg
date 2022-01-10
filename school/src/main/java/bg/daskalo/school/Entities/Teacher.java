@@ -19,7 +19,8 @@ public class Teacher {
 
     private String email;
 
-    @OneToOne(mappedBy = "teacher")
+    @OneToOne()
+    @JoinColumn(name = "subject_id")
     private Subject subject;
 
     public Teacher(String firstName, String middleName, String lastName,

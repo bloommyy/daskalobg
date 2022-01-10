@@ -1,5 +1,7 @@
 package bg.daskalo.school.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,8 +10,8 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "teacher_id")
+    @JsonIgnore
+    @OneToOne(mappedBy = "subject")
     private Teacher teacher;
 
     private String name;
