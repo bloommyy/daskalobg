@@ -89,7 +89,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/mark")
-    public ResponseEntity<?> addMark(UUID stId, Integer mark, UUID teacherId, Integer term) {
+    public ResponseEntity<?> addMark(@RequestParam(value = "stId") UUID stId, Integer mark, @RequestParam(value = "teacherId") UUID teacherId, Integer term) {
         Student student = studentRepo.findStudentById(stId);
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
@@ -125,7 +125,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/feedback")
-    public ResponseEntity<?> addFeedback(Long subjectId, UUID stId, String description) {
+    public ResponseEntity<?> addFeedback(Long subjectId,@RequestParam(value = "stId") UUID stId, String description) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 
@@ -155,7 +155,7 @@ public class TeacherController {
     }
 
     @PostMapping("/add/absence")
-    public ResponseEntity<?> addAbsence(Long subjectId, UUID stId, boolean isAbsence) {
+    public ResponseEntity<?> addAbsence(Long subjectId, @RequestParam(value = "stId") UUID stId, boolean isAbsence) {
         Student student = studentRepo.findStudentById(stId);
         Subject subject = subjectRepo.findSubjectById(subjectId);
 

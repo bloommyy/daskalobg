@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/student")
 public class StudentController {
     private final StudentRepository studentRepo;
     private final StudentLoginRepository studentLoginRepo;
@@ -82,7 +82,7 @@ public class StudentController {
     }
 
     @GetMapping("/marks")
-    public ResponseEntity<?> getMarks(UUID stId) {
+    public ResponseEntity<?> getMarks(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
         if(st == null)
@@ -94,7 +94,7 @@ public class StudentController {
     }
 
     @GetMapping("/absences")
-    public ResponseEntity<?> getAbsences(UUID stId) {
+    public ResponseEntity<?> getAbsences(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
         if(st == null)
@@ -106,7 +106,7 @@ public class StudentController {
     }
 
     @GetMapping("/feedbacks")
-    public ResponseEntity<?> getFeedbacks(UUID stId) {
+    public ResponseEntity<?> getFeedbacks(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
         if(st == null)

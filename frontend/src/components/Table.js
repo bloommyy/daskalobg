@@ -1,10 +1,10 @@
 import React from 'react';
-
 import { useTable } from 'react-table';
 import { Styles } from './HomePageCSS';
+import _ from 'lodash';
+
 
 function Table({ columns, data }) {
-    // Use the state and functions returned from useTable to build your UI
     const {
         getTableProps,
         getTableBodyProps,
@@ -16,7 +16,6 @@ function Table({ columns, data }) {
         data,
     })
 
-    // Render the UI for your table
     return (
         <table {...getTableProps()}>
             <thead>
@@ -44,18 +43,93 @@ function Table({ columns, data }) {
     )
 }
 
-export function GetMarksTable() {
-    const data = React.useMemo(
-        () => [
-            {
-                subject: 'Български език',
-                firstTerm: '6,6,6',
-                firstTermFinal: '6',
-                secondTerm: '6,6,6',
-                secondTermFinal: '6',
-                yearly: '6'
+export function GetMarksTable({ rawData, subjects }) {
+    if (rawData === null || typeof rawData === "undefined")
+        return <div></div>
+
+    if (rawData === '')
+        return <div></div>
+
+    let tableData = rawData.reduce((acc, el) => {
+        let findIndex = acc.findIndex(accEl => accEl.subject === el.subject.name);
+        let temparr = acc;
+        if (findIndex > -1) {
+            temparr[findIndex] = {
+                subject: temparr[findIndex].subject,
+                firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
+                    ? temparr[findIndex].firstTerm.toString().concat(el.mark)
+                    : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
+                firstTermFinal: el.term === 1 ? el.mark : '0',
+                secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
+                    ? temparr[findIndex].secondTerm.toString().concat(el.mark)
+                    : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
+                secondTermFinal: el.term === 2 ? el.mark : '0',
+                yearly: ''
             }
-        ],
+        } else {
+            temparr.push({
+                subject: el.subject.name,
+                firstTerm: el.term === 1 ? el.mark : '',
+                firstTermFinal: el.term === 1 ? el.mark : '',
+                secondTerm: el.term === 2 ? el.mark : '',
+                secondTermFinal: el.term === 2 ? el.mark : '',
+                yearly: ''
+            });
+        }
+
+        return temparr;
+    }, [])
+
+    console.log(tableData)
+    console.log(subjects)
+
+    subjects.map(function (currentValue, index, arr) {
+        let persists = false;
+        for (let i = 0; i < tableData.length; i++) {
+            if (currentValue.name === tableData[i].subject)
+                persists = true;
+        }
+        if (!persists) {
+            tableData.push({
+                subject: currentValue.name,
+                firstTerm: '',
+                firstTermFinal: '',
+                secondTerm: '',
+                secondTermFinal: '',
+                yearly: ''
+            })
+        }
+    })
+
+    tableData.map(function (currentValue, index, arr) {
+        currentValue.firstTermFinal = mean(currentValue.firstTerm)
+        currentValue.secondTermFinal = mean(currentValue.secondTerm)
+        currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
+    })
+
+    function mean(grades) {
+        let arr = grades.split(",");
+        let meanGrade = 0;
+        arr.map(function (currentValue, index, array) {
+            meanGrade += parseInt(currentValue);
+        })
+        meanGrade /= arr.length;
+
+        if (isNaN(meanGrade))
+            return '';
+
+        return meanGrade;
+    }
+
+    function yearlyMean(firstTerm, secondTerm) {
+        if (secondTerm === '' || firstTerm === '')
+            return '';
+
+        return (firstTerm + secondTerm) / 2;
+    }
+
+    const data = React.useMemo(
+        () => tableData,
         []
     )
 
@@ -106,7 +180,7 @@ export function GetMarksTable() {
     )
 }
 
-export function GetAbsencesTable() {
+export function GetAbsencesTable({ rawData, subjects }) {
     const data = React.useMemo(
         () => [
             {
@@ -153,7 +227,7 @@ export function GetAbsencesTable() {
     )
 }
 
-export function GetFeedbacksTable() {
+export function GetFeedbacksTable({ rawData, subjects }) {
     const data = React.useMemo(
         () => [
             {
