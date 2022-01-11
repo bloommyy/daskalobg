@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Button = styled.button`
     margin-left: 10px;
-    margin-top: 0px;
+    margin-top: 10px;
     width: ${props => props.width};
     height: 40px;
     border: 2px solid rgba(0, 21, 255, 0.68);
@@ -21,14 +21,15 @@ export const Button = styled.button`
 
 export const TeacherButton = styled.button`
     margin-left: 10px;
-    margin-top: 0px;
+    margin-top: 5px;
+    min-width: 95px;
     width: ${props => props.width};
     height: 40px;
     border: 2px solid black;
     border-radius: 18px;
     font-weight: bold;
     display:inline;
-
+    
     background: ${props => (props.selected ? 'black' : '#0f0')};
     color: ${props => (props.selected ? '#fff' : 'black')};
 

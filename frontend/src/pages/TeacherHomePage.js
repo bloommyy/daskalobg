@@ -177,8 +177,8 @@ export function TeacherHomePage() {
             <Button onClick={onAbsences} width='24.2%' selected={absences}>Отсъствия</Button>
             <Button onClick={onFeedback} width='24.2%' selected={feedbacks}>Забележки</Button>
             <TeacherButton selected={addNewMark} onClick={onAddNewMark} width='6%'>Оценка</TeacherButton>
-            <TeacherButton selected={addNewAbsence} onClick={onAddNewAbsence} width='8%'>Остъствие</TeacherButton>
-            <TeacherButton selected={addNewFeedback} onClick={onAddNewFeedback} width='8%'>Забележка</TeacherButton>
+            <TeacherButton selected={addNewAbsence} onClick={onAddNewAbsence} width='7%'>Остъствие</TeacherButton>
+            <TeacherButton selected={addNewFeedback} onClick={onAddNewFeedback} width='7%'>Забележка</TeacherButton>
             {
                 addNewMark && <AddNewMark hasToRefresh={onGrades} students={students} />
             }

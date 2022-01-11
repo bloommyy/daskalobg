@@ -71,7 +71,7 @@ export function StudentHomePage() {
                 setFeedback(true);
             })
             .catch(function (error) {
-                alert(error.response.data)
+                alert(error)
                 return;
             })
     }
