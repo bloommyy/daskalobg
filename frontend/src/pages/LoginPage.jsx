@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import { AppContainer, BoxContainer, TopContainer, HeaderContainer, HeaderText, InnerContainer, FormContainer, Input, SubmitButton } from '../components/LoginFormCSS';
 import { connect } from 'react-redux';
 import {login} from '../actions/auth';
-import MuiAlert from '@material-ui/lab/Alert';
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
 
 export default connect(({error}) => ({error}), { login })(props => {
     const [email, setEmail] = useState("");
@@ -37,11 +33,8 @@ export default connect(({error}) => ({error}), { login })(props => {
             </InnerContainer>
         </BoxContainer>
         {error && (
-                    <Alert severity="error" onClick={() => setError(null)}>
-                        {props.error || error}
-                    </Alert>
-                )
-                }
+            alert(error)
+        )}
     </AppContainer>
     )
 });

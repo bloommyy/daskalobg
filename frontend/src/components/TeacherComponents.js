@@ -2,23 +2,30 @@ import { BoxContainer, HeaderText, SubmitButton, Input } from './TeacherPageCSS'
 import { DropDownMenu } from '../components/DropDownMenu'
 import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
+import { useState } from 'react';
 
-export function AddNewMark({ students }) {
+export function AddNewMark({ students, hasToRefresh }) {
 
     var selectedPerson = '';
     var selectedMark = 0;
+
+    const [selPerson, setSelPerson] = useState('');
+    const [selMark, setSelMark] = useState('');
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
 
     function onPersonChange(value) {
         students.map(function (item, index, array) {
-            if (item.names === value)
+            if (item.names === value) {
                 selectedPerson = item
+                setSelPerson(item)
+            }
         })
     }
 
     function onMarkChange(value) {
         selectedMark = value
+        setSelMark(value)
     }
 
     const marks = [2, 3, 4, 5, 6]
@@ -33,14 +40,26 @@ export function AddNewMark({ students }) {
         let month = new Date().getMonth;
         let term = 1;
 
-        if (month >= 2 && month <= 6)
+        if (month >= 1 && month <= 5)
             term = 2;
 
-        axios.post('http://localhost:8080/teacher/mark/add?stId=' + selectedPerson.id + '&mark=' + selectedMark + '&teacherId=' + userJSON.id + '&term=' + term)
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (selectedMark === '' && selMark === '') {
+            alert("Не сте избрали оценка.")
+            return;
+        }
+
+        axios.post('http://localhost:8080/teacher/mark/add?stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&mark=' + (selectedMark != 0 ? selectedMark : selMark) + '&teacherId=' + userJSON.id + '&term=' + term)
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
+
+        hasToRefresh()
     }
 
     return (
@@ -54,22 +73,28 @@ export function AddNewMark({ students }) {
     )
 }
 
-export function AddNewAbsence({ students }) {
+export function AddNewAbsence({ students, hasToRefresh }) {
 
     var selectedPerson = '';
-    var isAbsence = false;
+    var isAbsence = null;
+
+    const [selPerson, setSelPerson] = useState('')
+    const [isAbs, setIsAbs] = useState(null)
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
 
     function onPersonChange(value) {
         students.map(function (item, index, array) {
-            if (item.names === value)
+            if (item.names === value) {
                 selectedPerson = item
+                setSelPerson(item)
+            }
         })
     }
 
     function onTypeChange(value) {
-        isAbsence = value === 'Остъствие' ? true : false;
+        isAbsence = value === 'Остъствие' ? true : false
+        setIsAbs(value === 'Остъствие' ? true : false)
     }
 
     const absence = ['Остъствие', 'Закъснение']
@@ -80,11 +105,23 @@ export function AddNewAbsence({ students }) {
     })
 
     function addAbsence() {
-        axios.post('http://localhost:8080/teacher/absence/add?&teacherId=' + userJSON.id + '&stId=' + selectedPerson.id + '&isAbsence=' + isAbsence)
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (isAbs === null && isAbsence === null) {
+            alert("Не сте избрали тип на отсъствието.")
+            return;
+        }
+
+        axios.post('http://localhost:8080/teacher/absence/add?&teacherId=' + userJSON.id + '&stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&isAbsence=' + (isAbsence !== null ? isAbsence : isAbs))
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
+
+        hasToRefresh()
     }
 
     return (
@@ -98,18 +135,27 @@ export function AddNewAbsence({ students }) {
     )
 }
 
-export function AddNewFeedback({ students }) {
+export function AddNewFeedback({ students, hasToRefresh }) {
 
     var selectedPerson = '';
-    var description = 0;
+    var description = '';
+    const [selPerson, setSelPerson] = useState('')
+    const [desc, setDesc] = useState('')
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
 
     function onPersonChange(value) {
         students.map(function (item, index, array) {
-            if (item.names === value)
+            if (item.names === value) {
                 selectedPerson = item
+                setSelPerson(item)
+            }
         })
+    }
+
+    function onDescChange(value) {
+        description = value;
+        setDesc(value)
     }
 
     const studentNames = []
@@ -119,11 +165,23 @@ export function AddNewFeedback({ students }) {
     })
 
     function addFeedback() {
-        axios.post('http://localhost:8080/teacher/feedback/add?teacherId=' + userJSON.id + '&stId=' + selectedPerson.id + '&description=' + description)
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (description !== '' && desc !== '') {
+            alert("Не сте въвели описание.")
+            return;
+        }
+
+        axios.post('http://localhost:8080/teacher/feedback/add?teacherId=' + userJSON.id + '&stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&description=' + (description !== '' ? description : desc))
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
+
+        hasToRefresh()
     }
 
     return (
@@ -131,7 +189,7 @@ export function AddNewFeedback({ students }) {
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={studentNames} onChange={onPersonChange} />
             <HeaderText>Напишете описание</HeaderText>
-            <Input onChange={e => description = e.target.value} />
+            <Input onChange={e => onDescChange(e.target.value)} />
             <SubmitButton top='66px' onClick={addFeedback}>Запиши забележка</SubmitButton>
         </BoxContainer>
     )

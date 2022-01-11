@@ -25,7 +25,7 @@ export function StudentHomePage() {
                     onGrades()
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     })
@@ -41,7 +41,7 @@ export function StudentHomePage() {
                 setFeedback(false);
             })
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
     }
@@ -57,7 +57,7 @@ export function StudentHomePage() {
                 setFeedback(false);
             })
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
     }
@@ -71,7 +71,7 @@ export function StudentHomePage() {
                 setFeedback(true);
             })
             .catch(function (error) {
-                alert(error)
+                alert(error.response.data)
                 return;
             })
     }

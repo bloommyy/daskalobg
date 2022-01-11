@@ -293,6 +293,12 @@ export function GetStudentsGradesTable({ rawData }) {
     }, [])
 
     studentsMarks.map(function (currentValue, index, arr) {
+        let mark = currentValue.firstTerm.split(', ').reverse().join(', ')
+        currentValue.firstTerm = mark
+
+        mark = currentValue.secondTerm.split(', ').reverse().join(', ')
+        currentValue.secondTerm = mark
+
         currentValue.firstTermFinal = mean(currentValue.firstTerm)
         currentValue.secondTermFinal = mean(currentValue.secondTerm)
         currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)

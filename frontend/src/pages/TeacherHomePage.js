@@ -35,7 +35,7 @@ export function TeacherHomePage() {
                     setClasses(response.data);
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     })
@@ -60,7 +60,7 @@ export function TeacherHomePage() {
                     setGrades(true)
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     }
@@ -73,11 +73,12 @@ export function TeacherHomePage() {
                         return;
                     setAbsencesData(response.data);
                     setGrades(false);
-                    setAbsences(true);
+                    setAbsences(false);
                     setFeedback(false);
+                    setAbsences(true);
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     }
@@ -89,10 +90,11 @@ export function TeacherHomePage() {
                     setFeedbacksData(response.data);
                     setGrades(false);
                     setAbsences(false);
+                    setFeedback(false);
                     setFeedback(true);
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     }
@@ -116,16 +118,32 @@ export function TeacherHomePage() {
                     setAddNewFeedback(false)
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     }
 
     function onAddNewAbsence() {
         if (selectedClass !== '' || selClass !== '') {
-            setAddNewMark(false)
-            setAddNewAbsence(!addNewAbsence)
-            setAddNewFeedback(false)
+            axios.get('http://localhost:8080/student/nameByClass?stClass=' + (selectedClass !== '' ? selectedClass : selClass))
+                .then(function (response) {
+                    let tempStudents = [];
+                    response.data.map(function (item, index, array) {
+                        tempStudents.push({
+                            id: item.id,
+                            names: item.firstName + " " + item.middleName + " " + item.lastName
+                        })
+                    })
+
+                    setStudents(tempStudents);
+                    setAddNewMark(false)
+                    setAddNewAbsence(!addNewAbsence)
+                    setAddNewFeedback(false)
+                })
+                .catch(function (error) {
+                    alert(error.response.data)
+                    return;
+                })
         }
     }
 
@@ -147,7 +165,7 @@ export function TeacherHomePage() {
                     setAddNewFeedback(!addNewFeedback)
                 })
                 .catch(function (error) {
-                    alert(error)
+                    alert(error.response.data)
                     return;
                 })
     }
@@ -162,13 +180,13 @@ export function TeacherHomePage() {
             <TeacherButton selected={addNewAbsence} onClick={onAddNewAbsence} width='8%'>Остъствие</TeacherButton>
             <TeacherButton selected={addNewFeedback} onClick={onAddNewFeedback} width='8%'>Забележка</TeacherButton>
             {
-                addNewMark && <AddNewMark students={students} />
+                addNewMark && <AddNewMark hasToRefresh={onGrades} students={students} />
             }
             {
-                addNewAbsence && <AddNewAbsence students={students} />
+                addNewAbsence && <AddNewAbsence hasToRefresh={onAbsences} students={students} />
             }
             {
-                addNewFeedback && <AddNewFeedback students={students} />
+                addNewFeedback && <AddNewFeedback hasToRefresh={onFeedback} students={students} />
             }
             {
                 grades && <GetStudentsGradesTable rawData={gradesData} />

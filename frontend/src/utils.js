@@ -22,12 +22,14 @@ export function mean(grades) {
     if (isNaN(meanGrade))
         return '';
 
-    return meanGrade;
+    return meanGrade.toFixed(2);
 }
 
 export function yearlyMean(firstTerm, secondTerm) {
     if (secondTerm === '' || firstTerm === '')
         return '';
 
-    return (firstTerm + secondTerm) / 2;
+    let mark = parseInt(firstTerm) + parseInt(secondTerm)
+
+    return (mark) / 2;
 }
