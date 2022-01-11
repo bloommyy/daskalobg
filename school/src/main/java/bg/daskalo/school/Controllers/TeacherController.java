@@ -111,7 +111,13 @@ public class TeacherController {
     }
 
     @DeleteMapping("/mark/delete")
-    public ResponseEntity<?> deleteMark(Long id) {
+    public ResponseEntity<?> deleteMark(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
+        if (teacher == null){
+            return new ResponseEntity<>("Missing privileges.", HttpStatus.BAD_REQUEST);
+        }
+
         Mark deleteMark = markRepo.findMarkById(id);
 
         if (deleteMark == null)
@@ -141,7 +147,13 @@ public class TeacherController {
     }
 
     @DeleteMapping("/feedback/delete")
-    public ResponseEntity<?> deleteFeedback(Long id) {
+    public ResponseEntity<?> deleteFeedback(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
+        if (teacher == null){
+            return new ResponseEntity<>("Missing privileges.", HttpStatus.BAD_REQUEST);
+        }
+
         Feedback deleteFeedback = feedbackRepo.findFeedbackById(id);
 
         if (deleteFeedback == null)
@@ -153,22 +165,30 @@ public class TeacherController {
     }
 
     @PostMapping("/absence/add")
-    public ResponseEntity<?> addAbsence(Long subjectId, @RequestParam(value = "stId") UUID stId, boolean isAbsence) {
+    public ResponseEntity<?> addAbsence(@RequestParam(value = "teacherId") UUID teacherId, @RequestParam(value = "stId") UUID stId, boolean isAbsence) {
         Student student = studentRepo.findStudentById(stId);
-        Subject subject = subjectRepo.findSubjectById(subjectId);
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
         if (student == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
-        if (subject == null)
-            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+        if (teacher == null)
+            return new ResponseEntity<>("Teacher not found.", HttpStatus.BAD_REQUEST);
+
+        Subject subject = teacher.getSubject();
 
         Absence addAbsence = absenceRepo.save(new Absence(student, new Date(), isAbsence, subject));
         return new ResponseEntity<>("Absence given to " + addAbsence.getStudent().getFirstName() + ".", HttpStatus.CREATED);
     }
 
     @PostMapping("/absence/excuse")
-    public ResponseEntity<?> excuseAbsence(Long id) {
+    public ResponseEntity<?> excuseAbsence(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
+        if (teacher == null){
+            return new ResponseEntity<>("Missing privileges.", HttpStatus.BAD_REQUEST);
+        }
+
         Absence excuseAbsence = absenceRepo.findAbsenceById(id);
 
         if (excuseAbsence == null)
@@ -185,7 +205,13 @@ public class TeacherController {
     }
 
     @DeleteMapping("/absence/delete")
-    public ResponseEntity<?> deleteAbsence(Long id) {
+    public ResponseEntity<?> deleteAbsence(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
+        if (teacher == null){
+            return new ResponseEntity<>("Missing privileges.", HttpStatus.BAD_REQUEST);
+        }
+
         Absence deleteAbsence = absenceRepo.findAbsenceById(id);
 
         if (deleteAbsence == null)
@@ -197,7 +223,13 @@ public class TeacherController {
     }
 
     @GetMapping("/classes")
-    public ResponseEntity<?> getAllClasses() {
+    public ResponseEntity<?> getAllClasses(@RequestParam(value = "teacherId") UUID teacherId) {
+        Teacher teacher = teacherRepo.findTeacherById(teacherId);
+
+        if (teacher == null){
+            return new ResponseEntity<>("Missing privileges.", HttpStatus.BAD_REQUEST);
+        }
+
         return ResponseEntity.ok(teacherRepo.fetchAllClasses());
     }
 }

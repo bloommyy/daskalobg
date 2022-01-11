@@ -2,9 +2,13 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.*;
 import bg.daskalo.school.Entities.Login.StudentLogin;
+import bg.daskalo.school.Models.StudentAbsenceModel;
+import bg.daskalo.school.Models.StudentFeedbackModel;
+import bg.daskalo.school.Models.StudentMarkModel;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.StudentLoginRepository;
 import bg.daskalo.school.Repositories.StudentRepository;
+import bg.daskalo.school.Repositories.SubjectRepository;
 import bg.daskalo.school.Repositories.TeacherRepository;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
@@ -15,6 +19,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -26,11 +31,13 @@ public class StudentController {
     private final StudentRepository studentRepo;
     private final StudentLoginRepository studentLoginRepo;
     private final TeacherRepository teacherRepo;
+    private final SubjectRepository subjectRepo;
 
-    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo, TeacherRepository teacherRepo) {
+    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo, TeacherRepository teacherRepo, SubjectRepository subjectRepo) {
         this.studentRepo = studentRepo;
         this.studentLoginRepo = studentLoginRepo;
         this.teacherRepo = teacherRepo;
+        this.subjectRepo = subjectRepo;
     }
 
     @Transactional
@@ -87,7 +94,7 @@ public class StudentController {
     public ResponseEntity<?> getMarks(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
-        if(st == null)
+        if (st == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
         List<Mark> marks = st.getMarks();
@@ -99,7 +106,7 @@ public class StudentController {
     public ResponseEntity<?> getAbsences(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
-        if(st == null)
+        if (st == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
         List<Absence> absences = st.getAbsences();
@@ -111,7 +118,7 @@ public class StudentController {
     public ResponseEntity<?> getFeedbacks(@RequestParam(value = "stId") UUID stId) {
         Student st = studentRepo.findStudentById(stId);
 
-        if(st == null)
+        if (st == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
         List<Feedback> feedbacks = st.getFeedbacks();
@@ -119,11 +126,95 @@ public class StudentController {
         return ResponseEntity.ok(feedbacks);
     }
 
-    @GetMapping("/byClass")
-    public ResponseEntity<?> getStudentsByClass(String stClass){
+    @GetMapping("/marks/byClassAndSubject")
+    public ResponseEntity<?> getMarksByClassAndBySubject(String stClass, Long sjId) {
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+        Subject subject = subjectRepo.findSubjectById(sjId);
+
+        if (students != null & students.isEmpty())
+            return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
+
+        if (subject == null)
+            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+
+        List<StudentMarkModel> studentMarkList = new ArrayList<>();
+
+        for (Student student : students) {
+            for (Mark mark : student.getMarks()) {
+                if (mark.getSubject() == subject) {
+                    studentMarkList.add(new StudentMarkModel(
+                            student.getFirstName() + " " + student.getMiddleName() + " " +
+                                    student.getLastName(),
+                            mark.getMark(), mark.getTerm()
+                    ));
+                }
+            }
+        }
+
+        return ResponseEntity.ok(studentMarkList);
+    }
+
+    @GetMapping("/absences/byClassAndSubject")
+    public ResponseEntity<?> getAbsencesByClassAndBySubject(String stClass, Long sjId) {
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+        Subject subject = subjectRepo.findSubjectById(sjId);
+
+        if (students != null & students.isEmpty())
+            return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
+
+        if (subject == null)
+            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+
+        List<StudentAbsenceModel> studentAbsenceList = new ArrayList<>();
+
+        for (Student student : students) {
+            for (Absence absence : student.getAbsences()) {
+                if (absence.getSubject() == subject) {
+                    studentAbsenceList.add(new StudentAbsenceModel(
+                            student.getFirstName() + " " + student.getMiddleName() + " " +
+                                    student.getLastName(),
+                            absence.isAbsence(), absence.isExcused(), absence.getDate()
+                    ));
+                }
+            }
+        }
+
+        return ResponseEntity.ok(studentAbsenceList);
+    }
+
+    @GetMapping("/feedbacks/byClassAndSubject")
+    public ResponseEntity<?> getFeedbacksByClassAndBySubject(String stClass, Long sjId) {
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+        Subject subject = subjectRepo.findSubjectById(sjId);
+
+        if (students != null & students.isEmpty())
+            return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
+
+        if (subject == null)
+            return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
+
+        List<StudentFeedbackModel> studentFeedackList = new ArrayList<>();
+
+        for (Student student : students) {
+            for (Feedback feedback : student.getFeedbacks()) {
+                if (feedback.getSubject() == subject) {
+                    studentFeedackList.add(new StudentFeedbackModel(
+                            student.getFirstName() + " " + student.getMiddleName() + " " +
+                                    student.getLastName(),
+                            feedback.getDescription(), feedback.getDate()
+                    ));
+                }
+            }
+        }
+
+        return ResponseEntity.ok(studentFeedackList);
+    }
+
+    @GetMapping("/nameByClass")
+    public ResponseEntity<?> getStudentNamesByClass(String stClass) {
         Set<Student> students = studentRepo.findStudentsByStClass(stClass);
 
-        if(students != null & students.isEmpty())
+        if (students != null & students.isEmpty())
             return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
 
         return ResponseEntity.ok(students);
