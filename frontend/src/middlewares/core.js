@@ -13,7 +13,7 @@ export const apiMiddleware = ({ dispatch }) => next => action => {
         })
             .then(({ data }) => dispatch(apiSuccess({ response: data })))
             .catch(error => {
-                console.log(error);
+                console.error(error);
                 dispatch(apiError({ error: error.response.data }));
             });
     }

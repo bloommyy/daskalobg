@@ -1,5 +1,5 @@
-import { API_SUCCESS, API_ERROR } from "./actions/api";
-import { LOGOUT } from './actions/auth';
+import { API_SUCCESS, API_ERROR } from "../actions/api";
+import { LOGOUT } from '../actions/auth';
 
 export default (
     state = {
