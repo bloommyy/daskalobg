@@ -1,28 +1,38 @@
 import Nav from '../components/TeacherAppNavBar';
 import { Button, Form, TeacherButton } from '../components/HomePageCSS';
-import { GetStudentsTable, GetAbsencesTable, GetFeedbacksTable } from '../components/Table';
+import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetStudentsFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { AddNewAbsence, AddNewMark, AddNewFeedback } from '../components/TeacherComponents';
 
 export function TeacherHomePage() {
-    const [Grades, setGrades] = useState(false);
-    const [Absences, setAbsences] = useState(false);
-    const [Feedbacks, setFeedback] = useState(false);
+    const [grades, setGrades] = useState(false);
+    const [absences, setAbsences] = useState(false);
+    const [feedbacks, setFeedback] = useState(false);
     const userJSON = JSON.parse(localStorage.getItem('user'));
 
-    const [GradesData, setGradesData] = useState('');
-    const [AbsencesData, setAbsencesData] = useState('');
-    const [FeedbacksData, setFeedbacksData] = useState('');
-    const [Classes, setClasses] = useState(null);
+    const [gradesData, setGradesData] = useState([]);
+    const [absencesData, setAbsencesData] = useState('');
+    const [feedbacksData, setFeedbacksData] = useState('');
+    const [classes, setClasses] = useState([]);
+    const [selClass, setSelClass] = useState('');
+
+    const [students, setStudents] = useState([]);
+
+    const [addNewMark, setAddNewMark] = useState(false);
+    const [addNewAbsence, setAddNewAbsence] = useState(false);
+    const [addNewFeedback, setAddNewFeedback] = useState(false);
+
+    var selectedClass = '';
 
     useEffect(() => {
-        if (Classes === null)
-            axios.get('http://localhost:8080/teacher/classes')
+        if (classes.length === 0)
+            axios.get('http://localhost:8080/teacher/classes?teacherId=' + userJSON.id)
                 .then(function (response) {
                     if (typeof response.data === 'undefined')
                         return;
+
                     setClasses(response.data);
-                    console.log(response.data)
                 })
                 .catch(function (error) {
                     alert(error)
@@ -30,70 +40,144 @@ export function TeacherHomePage() {
                 })
     })
 
+    function onChange(item) {
+        selectedClass = item
+        setSelClass(item)
+        onGrades()
+    }
+
     function onGrades() {
-        console.log(userJSON)
-        axios.get('http://localhost:8080/student/byClass?stClass=' + userJSON.subject.sjClass + 'A')
-            .then(function (response) {
-                if (typeof response.data === 'undefined')
+        if (selectedClass !== '' || selClass !== '')
+            axios.get('http://localhost:8080/student/marks/byClassAndSubject?stClass=' + (selectedClass !== '' ? selectedClass : selClass) + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    if (typeof response.data === 'undefined')
+                        return;
+
+                    setGradesData(response.data)
+                    setGrades(false);
+                    setAbsences(false);
+                    setFeedback(false);
+                    setGrades(true)
+                })
+                .catch(function (error) {
+                    alert(error)
                     return;
-                setGradesData(response.data)
-                setGrades(true);
-                setAbsences(false);
-                setFeedback(false);
-            })
-            .catch(function (error) {
-                alert(error)
-                return;
-            })
+                })
     }
 
     function onAbsences() {
-        axios.get('http://localhost:8080/student/absences?stId=' + userJSON.uuid)
-            .then(function (response) {
-                if (typeof response.data === 'undefined')
+        if (selClass !== '')
+            axios.get('http://localhost:8080/student/absences/byClassAndSubject?stClass=' + selClass + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    if (typeof response.data === 'undefined')
+                        return;
+                    setAbsencesData(response.data);
+                    setGrades(false);
+                    setAbsences(true);
+                    setFeedback(false);
+                })
+                .catch(function (error) {
+                    alert(error)
                     return;
-                setAbsencesData(response.data);
-                setGrades(false);
-                setAbsences(true);
-                setFeedback(false);
-            })
-            .catch(function (error) {
-                alert(error)
-                return;
-            })
+                })
     }
 
     function onFeedback() {
-        axios.get('http://localhost:8080/student/feedbacks?stId=' + userJSON.uuid)
-            .then(function (response) {
-                setFeedbacksData(response.data);
-                setGrades(false);
-                setAbsences(false);
-                setFeedback(true);
-            })
-            .catch(function (error) {
-                alert(error)
-                return;
-            })
+        if (selClass !== '')
+            axios.get('http://localhost:8080/student/feedbacks/byClassAndSubject?stClass=' + selClass + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    setFeedbacksData(response.data);
+                    setGrades(false);
+                    setAbsences(false);
+                    setFeedback(true);
+                })
+                .catch(function (error) {
+                    alert(error)
+                    return;
+                })
+    }
+
+
+    function onAddNewMark() {
+        if (selectedClass !== '' || selClass !== '')
+            axios.get('http://localhost:8080/student/nameByClass?stClass=' + (selectedClass !== '' ? selectedClass : selClass))
+                .then(function (response) {
+                    let tempStudents = [];
+                    response.data.map(function (item, index, array) {
+                        tempStudents.push({
+                            id: item.id,
+                            names: item.firstName + " " + item.middleName + " " + item.lastName
+                        })
+                    })
+
+                    setStudents(tempStudents);
+                    setAddNewMark(!addNewMark)
+                    setAddNewAbsence(false)
+                    setAddNewFeedback(false)
+                })
+                .catch(function (error) {
+                    alert(error)
+                    return;
+                })
+    }
+
+    function onAddNewAbsence() {
+        if (selectedClass !== '' || selClass !== '') {
+            setAddNewMark(false)
+            setAddNewAbsence(!addNewAbsence)
+            setAddNewFeedback(false)
+        }
+    }
+
+    function onAddNewFeedback() {
+        if (selectedClass !== '' || selClass !== '')
+            axios.get('http://localhost:8080/student/nameByClass?stClass=' + (selectedClass !== '' ? selectedClass : selClass))
+                .then(function (response) {
+                    let tempStudents = [];
+                    response.data.map(function (item, index, array) {
+                        tempStudents.push({
+                            id: item.id,
+                            names: item.firstName + " " + item.middleName + " " + item.lastName
+                        })
+                    })
+
+                    setStudents(tempStudents);
+                    setAddNewMark(false)
+                    setAddNewAbsence(false)
+                    setAddNewFeedback(!addNewFeedback)
+                })
+                .catch(function (error) {
+                    alert(error)
+                    return;
+                })
     }
 
     return (
         <Form>
-            <Nav classes={Classes} />
-            <Button onClick={onGrades} width='24.2%' selected={Grades}>Оценки</Button>
-            <Button onClick={onAbsences} width='24.2%' selected={Absences}>Отсъствия</Button>
-            <Button onClick={onFeedback} width='24.2%' selected={Feedbacks}>Забележки</Button>
-            <TeacherButton width='6%'>Оценка</TeacherButton>
-            <TeacherButton width='8%'>Остъствие</TeacherButton>
-            <TeacherButton width='8%'>Забележка</TeacherButton>
+            <Nav classes={classes} selectedClassChanged={onChange} />
+            <Button onClick={onGrades} width='24.2%' selected={grades}>Оценки</Button>
+            <Button onClick={onAbsences} width='24.2%' selected={absences}>Отсъствия</Button>
+            <Button onClick={onFeedback} width='24.2%' selected={feedbacks}>Забележки</Button>
+            <TeacherButton selected={addNewMark} onClick={onAddNewMark} width='6%'>Оценка</TeacherButton>
+            <TeacherButton selected={addNewAbsence} onClick={onAddNewAbsence} width='8%'>Остъствие</TeacherButton>
+            <TeacherButton selected={addNewFeedback} onClick={onAddNewFeedback} width='8%'>Забележка</TeacherButton>
             {
-                Grades && <GetStudentsTable rawData={GradesData} subjects={SubjectsData} />
+                addNewMark && <AddNewMark students={students} />
             }
             {
-                Absences && <GetAbsencesTable rawData={AbsencesData} />
+                addNewAbsence && <AddNewAbsence students={students} />
             }
             {
-                Feedbacks && <GetFeedbacksTable rawData={FeedbacksData} />
+                addNewFeedback && <AddNewFeedback students={students} />
+            }
+            {
+                grades && <GetStudentsGradesTable rawData={gradesData} />
+            }
+            {
+                absences && <GetStudentsAbsencesTable rawData={absencesData} />
+            }
+            {
+                feedbacks && <GetStudentsFeedbacksTable rawData={feedbacksData} />
             }
         </Form>
     )

@@ -5,7 +5,6 @@ import { TeacherHomePage } from './TeacherHomePage';
 function HomePage() {
 
     const userJSON = JSON.parse(localStorage.getItem('user'));
-    console.log(userJSON.stClass === undefined)
     let isStudent = (userJSON.stClass !== undefined) ? true : false;
 
     return (

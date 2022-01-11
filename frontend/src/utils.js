@@ -10,3 +10,24 @@ export function timeConverter(UNIX_timestamp) {
     var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
     return time;
 }
+
+export function mean(grades) {
+    let arr = grades.split(",");
+    let meanGrade = 0;
+    arr.map(function (currentValue, index, array) {
+        meanGrade += parseInt(currentValue);
+    })
+    meanGrade /= arr.length;
+
+    if (isNaN(meanGrade))
+        return '';
+
+    return meanGrade;
+}
+
+export function yearlyMean(firstTerm, secondTerm) {
+    if (secondTerm === '' || firstTerm === '')
+        return '';
+
+    return (firstTerm + secondTerm) / 2;
+}

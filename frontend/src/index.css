@@ -31,10 +31,12 @@ code {
 
 .dropdown-menu.show {
   background-color: rgb(55, 60, 65);
-  color: white;
-  transform: translate3d(-34px, 36px, 0px);
 }
 
 .ddItem.dropdown-item {
   color: white;
+}
+
+.k-form {
+  margin-top: -28px;
 }

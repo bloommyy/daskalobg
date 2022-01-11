@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable } from 'react-table';
 import { Styles } from './HomePageCSS';
 import _ from 'lodash';
-import { timeConverter } from '../utils';
+import { timeConverter, mean, yearlyMean } from '../utils';
 
 function Table({ columns, data }) {
     const {
@@ -112,27 +112,6 @@ export function GetMarksTable({ rawData, subjects }) {
             currentValue.secondTermFinal = mean(currentValue.secondTerm)
             currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
         })
-
-        function mean(grades) {
-            let arr = grades.split(",");
-            let meanGrade = 0;
-            arr.map(function (currentValue, index, array) {
-                meanGrade += parseInt(currentValue);
-            })
-            meanGrade /= arr.length;
-
-            if (isNaN(meanGrade))
-                return '';
-
-            return meanGrade;
-        }
-
-        function yearlyMean(firstTerm, secondTerm) {
-            if (secondTerm === '' || firstTerm === '')
-                return '';
-
-            return (firstTerm + secondTerm) / 2;
-        }
     }
 
     const data = React.useMemo(
@@ -196,7 +175,7 @@ export function GetAbsencesTable({ rawData }) {
             tableData.push({
                 subject: item.subject.name,
                 type: item.absence === true ? 'Отсъствие' : 'Закъснение',
-                excused: item.excused === true ? 'Извинено' : 'Неизвинено',
+                excused: item.excused === true ? 'Да' : 'Не',
                 date: timeConverter(item.date)
             })
         })
@@ -280,59 +259,47 @@ export function GetFeedbacksTable({ rawData }) {
     )
 }
 
-export function GetStudentsTable({ rawData }) {
+export function GetStudentsGradesTable({ rawData }) {
 
-    let tableData = [];
     let studentsMarks = [];
-    console.log(rawData)
 
-    rawData.map(function (item, index, arr) {
-        studentsMarks = item.marks.reduce((acc, el) => {
-            let findIndex = acc.findIndex(accEl => accEl.subject === el.subject.name);
-            let temparr = acc;
-            if (findIndex > -1) {
-                temparr[findIndex] = {
-                    subject: temparr[findIndex].subject,
-                    firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
-                        ? temparr[findIndex].firstTerm.toString().concat(el.mark)
-                        : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
-                    firstTermFinal: el.term === 1 ? el.mark : '0',
-                    secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
-                        ? temparr[findIndex].secondTerm.toString().concat(el.mark)
-                        : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
-                    secondTermFinal: el.term === 2 ? el.mark : '0',
-                    yearly: ''
-                }
-            } else {
-                temparr.push({
-                    subject: el.subject.name,
-                    firstTerm: el.term === 1 ? el.mark : '',
-                    firstTermFinal: el.term === 1 ? el.mark : '',
-                    secondTerm: el.term === 2 ? el.mark : '',
-                    secondTermFinal: el.term === 2 ? el.mark : '',
-                    yearly: ''
-                });
+    studentsMarks = rawData.reduce((acc, el) => {
+        let findIndex = acc.findIndex(accEl => accEl.studentName === el.studentName);
+        let temparr = acc;
+        if (findIndex > -1) {
+            temparr[findIndex] = {
+                studentName: temparr[findIndex].studentName,
+                firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
+                    ? temparr[findIndex].firstTerm.toString().concat(el.mark)
+                    : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
+                firstTermFinal: el.term === 1 ? el.mark : '0',
+                secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
+                    ? temparr[findIndex].secondTerm.toString().concat(el.mark)
+                    : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
+                secondTermFinal: el.term === 2 ? el.mark : '0',
+                yearly: '',
             }
+        } else {
+            temparr.push({
+                studentName: el.studentName,
+                firstTerm: el.term === 1 ? el.mark : '',
+                firstTermFinal: el.term === 1 ? el.mark : '',
+                secondTerm: el.term === 2 ? el.mark : '',
+                secondTermFinal: el.term === 2 ? el.mark : '',
+            });
+        }
 
-            return temparr;
-        }, [])
+        return temparr;
+    }, [])
+
+    studentsMarks.map(function (currentValue, index, arr) {
+        currentValue.firstTermFinal = mean(currentValue.firstTerm)
+        currentValue.secondTermFinal = mean(currentValue.secondTerm)
+        currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
     })
 
-    if (rawData !== null || typeof rawData !== "undefined" || rawData !== '') {
-        rawData.map(function (item, index, arr) {
-            tableData.push({
-                student: item.subject.name,
-                firstTerm: '',
-                firstTermFinal: '',
-                secondTerm: '',
-                secondTermFinal: '',
-                yearly: ''
-            })
-        })
-    }
-
     const data = React.useMemo(
-        () => tableData,
+        () => studentsMarks,
         []
     )
 
@@ -340,7 +307,7 @@ export function GetStudentsTable({ rawData }) {
         () => [
             {
                 Header: 'Ученик',
-                accessor: 'student'
+                accessor: 'studentName'
             },
             {
                 Header: 'Първи срок',
@@ -371,6 +338,95 @@ export function GetStudentsTable({ rawData }) {
             {
                 Header: 'Годишна',
                 accessor: 'yearly'
+            }
+        ],
+        []
+    )
+
+    return (
+        <Styles>
+            <Table columns={columns} data={data} />
+        </Styles>
+    )
+}
+
+export function GetStudentsAbsencesTable({ rawData }) {
+
+    let studentsAbsences = [];
+
+    rawData.map(function (item, index, array) {
+        studentsAbsences.push({
+            student: item.studentName,
+            type: item.absence === true ? 'Отсъствие' : 'Закъснение',
+            excused: item.excused === true ? 'Да' : 'Не',
+            date: timeConverter(item.date)
+        })
+    })
+
+    const data = React.useMemo(
+        () => studentsAbsences,
+        []
+    )
+
+    const columns = React.useMemo(
+        () => [
+            {
+                Header: 'Студент',
+                accessor: 'student'
+            },
+            {
+                Header: 'Тип',
+                accessor: 'type'
+            },
+            {
+                Header: 'Извинено',
+                accessor: 'excused'
+            },
+            {
+                Header: 'Дата',
+                accessor: 'date'
+            }
+        ],
+        []
+    )
+
+    return (
+        <Styles>
+            <Table columns={columns} data={data} />
+        </Styles>
+    )
+}
+
+export function GetStudentsFeedbacksTable({ rawData }) {
+
+    let studentsFeedbacks = [];
+
+    rawData.map(function (item, index, array) {
+        studentsFeedbacks.push({
+            student: item.studentName,
+            description: item.description,
+            date: timeConverter(item.date)
+        })
+    })
+
+    const data = React.useMemo(
+        () => studentsFeedbacks,
+        []
+    )
+
+    const columns = React.useMemo(
+        () => [
+            {
+                Header: 'Студент',
+                accessor: 'student'
+            },
+            {
+                Header: 'Описание',
+                accessor: 'description'
+            },
+            {
+                Header: 'Дата',
+                accessor: 'date'
             }
         ],
         []
