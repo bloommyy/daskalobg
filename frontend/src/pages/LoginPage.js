@@ -37,12 +37,6 @@ export default connect(({ error }) => ({ error }), { login })(props => {
                 <SubmitButton type="submit" onClick={btnOnClick}>Влез</SubmitButton>
             </InnerContainer>
         </BoxContainer>
-        {error && (
-            <Alert severity="error" onClick={() => setError(null)}>
-                {props.error || error}
-            </Alert>
-        )
-        }
     </AppContainer>
     )
 });
