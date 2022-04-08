@@ -5,18 +5,18 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export function StudentHomePage() {
-    const [Grades, setGrades] = useState(false);
-    const [Absences, setAbsences] = useState(false);
-    const [Feedbacks, setFeedback] = useState(false);
+    const [grades, setGrades] = useState(false);
+    const [absences, setAbsences] = useState(false);
+    const [feedbacks, setFeedback] = useState(false);
     const userJSON = JSON.parse(localStorage.getItem('user'));
 
-    const [GradesData, setGradesData] = useState('');
-    const [AbsencesData, setAbsencesData] = useState('');
-    const [FeedbacksData, setFeedbacksData] = useState('');
-    const [SubjectsData, setSubjectsData] = useState(null);
+    const [gradesData, setGradesData] = useState('');
+    const [absencesData, setAbsencesData] = useState('');
+    const [feedbacksData, setFeedbacksData] = useState('');
+    const [subjectsData, setSubjectsData] = useState(null);
 
     useEffect(() => {
-        if (SubjectsData === null)
+        if (subjectsData === null)
             axios.get('http://localhost:8080/subject/byClass?sjClass=' + userJSON.stClass.slice(0, -1))
                 .then(function (response) {
                     if (typeof response.data === 'undefined')
@@ -79,17 +79,17 @@ export function StudentHomePage() {
     return (
         <Form>
             <Nav />
-            <Button onClick={onGrades} width='32.5%' selected={Grades}>Оценки</Button>
-            <Button onClick={onAbsences} width='32.5%' selected={Absences}>Отсъствия</Button>
-            <Button onClick={onFeedback} width='32.5%' selected={Feedbacks}>Забележки</Button>
+            <Button onClick={onGrades} width='32.5%' selected={grades}>Оценки</Button>
+            <Button onClick={onAbsences} width='32.5%' selected={absences}>Отсъствия</Button>
+            <Button onClick={onFeedback} width='32.5%' selected={feedbacks}>Забележки</Button>
             {
-                Grades && <GetMarksTable rawData={GradesData} subjects={SubjectsData} />
+                grades && <GetMarksTable rawData={gradesData} subjects={subjectsData} />
             }
             {
-                Absences && <GetAbsencesTable rawData={AbsencesData} />
+                absences && <GetAbsencesTable rawData={absencesData} />
             }
             {
-                Feedbacks && <GetFeedbacksTable rawData={FeedbacksData} />
+                feedbacks && <GetFeedbacksTable rawData={feedbacksData} />
             }
         </Form>
     )
