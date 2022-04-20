@@ -6,10 +6,7 @@ import bg.daskalo.school.Models.StudentAbsenceModel;
 import bg.daskalo.school.Models.StudentFeedbackModel;
 import bg.daskalo.school.Models.StudentMarkModel;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
-import bg.daskalo.school.Repositories.StudentLoginRepository;
-import bg.daskalo.school.Repositories.StudentRepository;
-import bg.daskalo.school.Repositories.SubjectRepository;
-import bg.daskalo.school.Repositories.TeacherRepository;
+import bg.daskalo.school.Repositories.*;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
 import org.springframework.http.HttpStatus;
@@ -32,12 +29,14 @@ public class StudentController {
     private final StudentLoginRepository studentLoginRepo;
     private final TeacherRepository teacherRepo;
     private final SubjectRepository subjectRepo;
+    private final MarkRepository markRepo;
 
-    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo, TeacherRepository teacherRepo, SubjectRepository subjectRepo) {
+    StudentController(StudentRepository studentRepo, StudentLoginRepository studentLoginRepo, TeacherRepository teacherRepo, SubjectRepository subjectRepo, MarkRepository markRepo) {
         this.studentRepo = studentRepo;
         this.studentLoginRepo = studentLoginRepo;
         this.teacherRepo = teacherRepo;
         this.subjectRepo = subjectRepo;
+        this.markRepo = markRepo;
     }
 
     @Transactional
@@ -143,6 +142,7 @@ public class StudentController {
             for (Mark mark : student.getMarks()) {
                 if (mark.getSubject() == subject) {
                     studentMarkList.add(new StudentMarkModel(
+                            mark.getId(),
                             student.getFirstName() + " " + student.getMiddleName() + " " +
                                     student.getLastName(),
                             mark.getMark(), mark.getTerm()

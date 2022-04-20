@@ -44,79 +44,81 @@ function Table({ columns, data }) {
 }
 
 export function GetMarksTable({ rawData, subjects }) {
-    let tableData = [];
+    const data = React.useMemo(
+        () => {
+            console.log(rawData)
+            let tableData = [];
 
-    if (rawData === null || typeof rawData === "undefined" || rawData === '') {
-        subjects.map(function (item, index, arr) {
-            tableData.push({
-                subject: item.name,
-                firstTerm: '',
-                firstTermFinal: '',
-                secondTerm: '',
-                secondTermFinal: '',
-                yearly: ''
-            })
-        })
-    }
-    else {
-        tableData = rawData.reduce((acc, el) => {
-            let findIndex = acc.findIndex(accEl => accEl.subject === el.subject.name);
-            let temparr = acc;
-            if (findIndex > -1) {
-                temparr[findIndex] = {
-                    subject: temparr[findIndex].subject,
-                    firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
-                        ? temparr[findIndex].firstTerm.toString().concat(el.mark)
-                        : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
-                    firstTermFinal: el.term === 1 ? el.mark : '0',
-                    secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
-                        ? temparr[findIndex].secondTerm.toString().concat(el.mark)
-                        : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
-                    secondTermFinal: el.term === 2 ? el.mark : '0',
-                    yearly: ''
-                }
-            } else {
-                temparr.push({
-                    subject: el.subject.name,
-                    firstTerm: el.term === 1 ? el.mark : '',
-                    firstTermFinal: el.term === 1 ? el.mark : '',
-                    secondTerm: el.term === 2 ? el.mark : '',
-                    secondTermFinal: el.term === 2 ? el.mark : '',
-                    yearly: ''
-                });
-            }
-
-            return temparr;
-        }, [])
-
-        subjects.map(function (currentValue, index, arr) {
-            let persists = false;
-            for (let i = 0; i < tableData.length; i++) {
-                if (currentValue.name === tableData[i].subject)
-                    persists = true;
-            }
-            if (!persists) {
-                tableData.push({
-                    subject: currentValue.name,
-                    firstTerm: '',
-                    firstTermFinal: '',
-                    secondTerm: '',
-                    secondTermFinal: '',
-                    yearly: ''
+            if (rawData === null || typeof rawData === "undefined" || rawData === '') {
+                subjects.map(function (item, index, arr) {
+                    tableData.push({
+                        subject: item.name,
+                        firstTerm: '',
+                        firstTermFinal: '',
+                        secondTerm: '',
+                        secondTermFinal: '',
+                        yearly: ''
+                    })
                 })
             }
-        })
+            else {
+                tableData = rawData.reduce((acc, el) => {
+                    let findIndex = acc.findIndex(accEl => accEl.subject === el.subject.name);
+                    let temparr = acc;
+                    if (findIndex > -1) {
+                        temparr[findIndex] = {
+                            subject: temparr[findIndex].subject,
+                            firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
+                                ? temparr[findIndex].firstTerm.toString().concat(el.mark)
+                                : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
+                            firstTermFinal: el.term === 1 ? el.mark : '0',
+                            secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
+                                ? temparr[findIndex].secondTerm.toString().concat(el.mark)
+                                : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
+                            secondTermFinal: el.term === 2 ? el.mark : '0',
+                            yearly: ''
+                        }
+                    } else {
+                        temparr.push({
+                            subject: el.subject.name,
+                            firstTerm: el.term === 1 ? el.mark : '',
+                            firstTermFinal: el.term === 1 ? el.mark : '',
+                            secondTerm: el.term === 2 ? el.mark : '',
+                            secondTermFinal: el.term === 2 ? el.mark : '',
+                            yearly: ''
+                        });
+                    }
 
-        tableData.map(function (currentValue, index, arr) {
-            currentValue.firstTermFinal = mean(currentValue.firstTerm)
-            currentValue.secondTermFinal = mean(currentValue.secondTerm)
-            currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
-        })
-    }
+                    return temparr;
+                }, [])
 
-    const data = React.useMemo(
-        () => tableData,
-        []
+                subjects.map(function (currentValue, index, arr) {
+                    let persists = false;
+                    for (let i = 0; i < tableData.length; i++) {
+                        if (currentValue.name === tableData[i].subject)
+                            persists = true;
+                    }
+                    if (!persists) {
+                        tableData.push({
+                            subject: currentValue.name,
+                            firstTerm: '',
+                            firstTermFinal: '',
+                            secondTerm: '',
+                            secondTermFinal: '',
+                            yearly: ''
+                        })
+                    }
+                })
+
+                tableData.map(function (currentValue, index, arr) {
+                    currentValue.firstTermFinal = mean(currentValue.firstTerm)
+                    currentValue.secondTermFinal = mean(currentValue.secondTerm)
+                    currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
+                })
+            }
+            return tableData
+        },
+        [rawData]
     )
 
     const columns = React.useMemo(

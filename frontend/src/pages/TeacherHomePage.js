@@ -3,7 +3,7 @@ import { Button, Form, TeacherButton } from '../components/HomePageCSS';
 import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetStudentsFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AddNewAbsence, AddNewMark, AddNewFeedback } from '../components/TeacherComponents';
+import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark } from '../components/TeacherComponents';
 
 export function TeacherHomePage() {
     const [grades, setGrades] = useState(false);
@@ -22,6 +22,12 @@ export function TeacherHomePage() {
     const [addNewMark, setAddNewMark] = useState(false);
     const [addNewAbsence, setAddNewAbsence] = useState(false);
     const [addNewFeedback, setAddNewFeedback] = useState(false);
+
+    const [removeMark, setRemoveMark] = useState(false);
+    const [removeAbsence, setRemoveAbsence] = useState(false);
+    const [removeFeedback, setRemoveFeedback] = useState(false);
+
+    const [marks, setMarks] = useState([]);
 
     var selectedClass = '';
 
@@ -54,6 +60,7 @@ export function TeacherHomePage() {
                         return;
 
                     setGradesData(response.data)
+                    console.log(response.data);
                     setGrades(false);
                     setAbsences(false);
                     setFeedback(false);
@@ -170,15 +177,51 @@ export function TeacherHomePage() {
                 })
     }
 
+    function onRemoveMark() {
+        if (selectedClass !== '' || selClass !== '')
+            axios.get('http://localhost:8080/student/nameByClass?stClass=' + (selectedClass !== '' ? selectedClass : selClass))
+                .then(function (response) {
+                    let tempStudents = [];
+                    response.data.map(function (item, index, array) {
+                        tempStudents.push({
+                            id: item.id,
+                            names: item.firstName + " " + item.middleName + " " + item.lastName
+                        })
+                    })
+
+                    setStudents(tempStudents)
+                    setAddNewMark(false)
+                    setAddNewAbsence(false)
+                    setAddNewFeedback(false)
+                    setRemoveMark(true)
+                })
+                .catch(function (error) {
+                    alert(error.response.data)
+                    return;
+                })
+    }
+
     return (
         <Form>
             <Nav classes={classes} selectedClassChanged={onChange} />
-            <Button onClick={onGrades} width='24.2%' selected={grades}>Оценки</Button>
-            <Button onClick={onAbsences} width='24.2%' selected={absences}>Отсъствия</Button>
-            <Button onClick={onFeedback} width='24.2%' selected={feedbacks}>Забележки</Button>
-            <TeacherButton selected={addNewMark} onClick={onAddNewMark} width='6%'>Оценка</TeacherButton>
-            <TeacherButton selected={addNewAbsence} onClick={onAddNewAbsence} width='7%'>Остъствие</TeacherButton>
-            <TeacherButton selected={addNewFeedback} onClick={onAddNewFeedback} width='7%'>Забележка</TeacherButton>
+            <Button onClick={onGrades} width='32.5%' selected={grades}>Оценки</Button>
+            <Button onClick={onAbsences} width='32.5%' selected={absences}>Отсъствия</Button>
+            <Button onClick={onFeedback} width='32.5%' selected={feedbacks}>Забележки</Button>
+            <TeacherButton isForAdding={true} selected={addNewMark} onClick={onAddNewMark} width='32.5%'>Добавете Оценка</TeacherButton>
+            <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='32.5%'>Добавете Остъствие</TeacherButton>
+            <TeacherButton isForAdding={true} selected={addNewFeedback} onClick={onAddNewFeedback} width='32.5%'>Добавете Забележка</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeMark} onClick={onRemoveMark} width='32.5%'>Премахнете Оценка</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeAbsence} width='32.5%'>Премахнете Остъствие</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeFeedback} width='32.5%'>Премахнете Забележка</TeacherButton>
+            {
+                removeMark && <RemoveMark hasToRefresh={onGrades} students={students} grades={gradesData} marks={marks} />
+            }
+            {
+                removeAbsence && <button></button>
+            }
+            {
+                removeFeedback && <button></button>
+            }
             {
                 addNewMark && <AddNewMark hasToRefresh={onGrades} students={students} />
             }

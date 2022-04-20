@@ -29,8 +29,7 @@ export const TeacherButton = styled.button`
     border-radius: 18px;
     font-weight: bold;
     display:inline;
-    
-    background: ${props => (props.selected ? 'black' : '#0f0')};
+    background: ${props => (props.selected ? 'black' : props.isForAdding ? '#0f0' : "#f00")};
     color: ${props => (props.selected ? '#fff' : 'black')};
 
     &:hover{

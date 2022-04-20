@@ -1,5 +1,6 @@
 import { BoxContainer, HeaderText, SubmitButton, Input } from './TeacherPageCSS';
-import { DropDownMenu } from '../components/DropDownMenu'
+import { DropDownMenu } from '../components/DropDownMenu';
+import { DropDownMenuMarks } from './DropDownMenuMarks';
 import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
@@ -191,6 +192,80 @@ export function AddNewFeedback({ students, hasToRefresh }) {
             <HeaderText>Напишете описание</HeaderText>
             <Input onChange={e => onDescChange(e.target.value)} />
             <SubmitButton top='66px' onClick={addFeedback}>Запиши забележка</SubmitButton>
+        </BoxContainer>
+    )
+}
+
+export function RemoveMark({ students, hasToRefresh, grades }) {
+    var selectedPerson = '';
+    var selectedMark = -1;
+
+    const [selPerson, setSelPerson] = useState('');
+    const [selMark, setSelMark] = useState('');
+
+    const userJSON = JSON.parse(localStorage.getItem('user'))
+    const [marks, setMarks] = useState([])
+    let marksIds = []
+
+    function onPersonChange(value) {
+        students.map(function (item, index, array) {
+            if (item.names === value) {
+                selectedPerson = item
+                setSelPerson(item)
+            }
+        })
+
+        let temp = marks
+        grades.map(function (item, index, array) {
+            if (item.studentName === value) {
+                temp.push(item.mark)
+                marksIds.push(item.id)
+            }
+        })
+        setMarks(temp.reverse())
+    }
+
+    function onMarkChange(value) {
+        console.log(value);
+        selectedMark = value
+        setSelMark(value)
+    }
+
+    const studentNames = []
+    students.map(function (item, index, array) {
+        studentNames.push(item.names)
+    })
+
+    function removeMark() {
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (selectedMark === -1 && selMark === -1) {
+            alert("Не сте избрали оценка.")
+            return;
+        }
+
+        let index = selectedMark === '' ? selMark.index : selectedMark.index;
+        let markId = marksIds[index];
+
+        axios.delete('http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + markId)
+            .catch(function (error) {
+                alert(error.response.data)
+                return;
+            })
+
+        hasToRefresh();
+    }
+
+    return (
+        <BoxContainer>
+            <HeaderText>Изберете ученик</HeaderText>
+            <DropDownMenu values={studentNames} onChange={onPersonChange} />
+            <HeaderText>Изберете оценка</HeaderText>
+            <DropDownMenuMarks values={marks} onChange={onMarkChange} />
+            <SubmitButton onClick={removeMark}>Запиши оценка</SubmitButton>
         </BoxContainer>
     )
 }

@@ -40,3 +40,17 @@ code {
 .k-form {
   margin-top: -28px;
 }
+
+#markButton {
+  margin-left: 10px;
+  margin-top: 10px;
+  height: 40px;
+  border: 2px solid black;
+  border-radius: 18px;
+  font-weight: bold;
+  display: inline;
+
+  background: rgba(0, 21, 255, 1);
+
+  color: #fff;
+}
