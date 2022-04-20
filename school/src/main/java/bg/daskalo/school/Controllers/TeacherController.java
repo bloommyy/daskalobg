@@ -88,6 +88,9 @@ public class TeacherController {
 
     @PostMapping("/mark/add")
     public ResponseEntity<?> addMark(@RequestParam(value = "stId") UUID stId, Integer mark, @RequestParam(value = "teacherId") UUID teacherId, Integer term) {
+        if(term == null)
+            return new ResponseEntity<>("term is invalid.", HttpStatus.BAD_REQUEST);
+
         Student student = studentRepo.findStudentById(stId);
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
@@ -112,6 +115,9 @@ public class TeacherController {
 
     @DeleteMapping("/mark/delete")
     public ResponseEntity<?> deleteMark(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        if(id == null)
+            return new ResponseEntity<>("id is invalid.", HttpStatus.BAD_REQUEST);
+
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
         if (teacher == null){
@@ -148,6 +154,9 @@ public class TeacherController {
 
     @DeleteMapping("/feedback/delete")
     public ResponseEntity<?> deleteFeedback(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        if(id == null)
+            return new ResponseEntity<>("id is invalid.", HttpStatus.BAD_REQUEST);
+
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
         if (teacher == null){
@@ -183,6 +192,9 @@ public class TeacherController {
 
     @PostMapping("/absence/excuse")
     public ResponseEntity<?> excuseAbsence(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        if(id == null)
+            return new ResponseEntity<>("id is invalid.", HttpStatus.BAD_REQUEST);
+
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
         if (teacher == null){
@@ -206,6 +218,9 @@ public class TeacherController {
 
     @DeleteMapping("/absence/delete")
     public ResponseEntity<?> deleteAbsence(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
+        if(id == null)
+            return new ResponseEntity<>("id is invalid.", HttpStatus.BAD_REQUEST);
+
         Teacher teacher = teacherRepo.findTeacherById(teacherId);
 
         if (teacher == null){
