@@ -29,7 +29,7 @@ export function yearlyMean(firstTerm, secondTerm) {
     if (secondTerm === '' || firstTerm === '')
         return '';
 
-    let mark = parseInt(firstTerm) + parseInt(secondTerm)
+    let mark = parseFloat(firstTerm) + parseFloat(secondTerm)
 
-    return (mark) / 2;
+    return ((mark) / 2).toPrecision(3);
 }

@@ -3,7 +3,8 @@ import { Button, Form, TeacherButton } from '../components/HomePageCSS';
 import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetStudentsFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark } from '../components/TeacherComponents';
+import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence } from '../components/TeacherComponents';
+import { set } from 'lodash';
 
 export function TeacherHomePage() {
     const [grades, setGrades] = useState(false);
@@ -60,7 +61,6 @@ export function TeacherHomePage() {
                         return;
 
                     setGradesData(response.data)
-                    console.log(response.data);
                     setGrades(false);
                     setAbsences(false);
                     setFeedback(false);
@@ -78,9 +78,11 @@ export function TeacherHomePage() {
                 .then(function (response) {
                     if (typeof response.data === 'undefined')
                         return;
+
+                    console.log("I WAS CALLED")
                     setAbsencesData(response.data);
-                    setGrades(false);
                     setAbsences(false);
+                    setGrades(false);
                     setFeedback(false);
                     setAbsences(true);
                 })
@@ -123,6 +125,9 @@ export function TeacherHomePage() {
                     setAddNewMark(!addNewMark)
                     setAddNewAbsence(false)
                     setAddNewFeedback(false)
+                    setRemoveMark(false)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(false)
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -146,6 +151,9 @@ export function TeacherHomePage() {
                     setAddNewMark(false)
                     setAddNewAbsence(!addNewAbsence)
                     setAddNewFeedback(false)
+                    setRemoveMark(false)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(false)
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -170,6 +178,9 @@ export function TeacherHomePage() {
                     setAddNewMark(false)
                     setAddNewAbsence(false)
                     setAddNewFeedback(!addNewFeedback)
+                    setRemoveMark(false)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(false)
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -193,7 +204,30 @@ export function TeacherHomePage() {
                     setAddNewMark(false)
                     setAddNewAbsence(false)
                     setAddNewFeedback(false)
-                    setRemoveMark(true)
+                    setRemoveMark(!removeMark)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(false)
+                })
+                .catch(function (error) {
+                    alert(error.response.data)
+                    return;
+                })
+    }
+
+    function onRemoveAbsence() {
+        if (selClass !== '')
+            axios.get('http://localhost:8080/student/absences/byClassAndSubject?stClass=' + selClass + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    if (typeof response.data === 'undefined')
+                        return;
+
+                    setAbsencesData(response.data);
+                    setAddNewAbsence(false)
+                    setAddNewMark(false)
+                    setAddNewFeedback(false)
+                    setRemoveMark(false)
+                    setRemoveAbsence(!removeAbsence)
+                    setRemoveFeedback(false)
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -211,13 +245,13 @@ export function TeacherHomePage() {
             <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='32.5%'>Добавете Остъствие</TeacherButton>
             <TeacherButton isForAdding={true} selected={addNewFeedback} onClick={onAddNewFeedback} width='32.5%'>Добавете Забележка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeMark} onClick={onRemoveMark} width='32.5%'>Премахнете Оценка</TeacherButton>
-            <TeacherButton isForAdding={false} selected={removeAbsence} width='32.5%'>Премахнете Остъствие</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeAbsence} onClick={onRemoveAbsence} width='32.5%'>Премахнете Остъствие</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeFeedback} width='32.5%'>Премахнете Забележка</TeacherButton>
             {
-                removeMark && <RemoveMark hasToRefresh={onGrades} students={students} grades={gradesData} marks={marks} />
+                removeMark && <RemoveMark hasToRefresh={onGrades} students={students} grades={gradesData} />
             }
             {
-                removeAbsence && <button></button>
+                removeAbsence && <RemoveAbsence hasToRefresh={onAbsences} students={students} absences={absencesData} ></RemoveAbsence>
             }
             {
                 removeFeedback && <button></button>

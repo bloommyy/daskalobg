@@ -1,9 +1,10 @@
 import { BoxContainer, HeaderText, SubmitButton, Input } from './TeacherPageCSS';
 import { DropDownMenu } from '../components/DropDownMenu';
-import { DropDownMenuMarks } from './DropDownMenuMarks';
+import { DropDownMenuAbsences, DropDownMenuMarks } from './DropDownMenuMarks';
 import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
+import { timeConverter } from '../utils';
 
 export function AddNewMark({ students, hasToRefresh }) {
 
@@ -198,14 +199,13 @@ export function AddNewFeedback({ students, hasToRefresh }) {
 
 export function RemoveMark({ students, hasToRefresh, grades }) {
     var selectedPerson = '';
-    var selectedMark = -1;
+    var selectedMark = '';
 
     const [selPerson, setSelPerson] = useState('');
     const [selMark, setSelMark] = useState('');
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
     const [marks, setMarks] = useState([])
-    let marksIds = []
 
     function onPersonChange(value) {
         students.map(function (item, index, array) {
@@ -215,18 +215,21 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
             }
         })
 
-        let temp = marks
+        let temp = []
         grades.map(function (item, index, array) {
-            if (item.studentName === value) {
-                temp.push(item.mark)
-                marksIds.push(item.id)
+            if (item.studentName === value && item.term === 2) {
+                temp.push(item)
+            }
+        })
+        grades.map(function (item, index, array) {
+            if (item.studentName === value && item.term === 1) {
+                temp.push(item)
             }
         })
         setMarks(temp.reverse())
     }
 
     function onMarkChange(value) {
-        console.log(value);
         selectedMark = value
         setSelMark(value)
     }
@@ -247,10 +250,7 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
             return;
         }
 
-        let index = selectedMark === '' ? selMark.index : selectedMark.index;
-        let markId = marksIds[index];
-
-        axios.delete('http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + markId)
+        axios.delete('http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + selMark.id === undefined ? selectedMark : selMark.id)
             .catch(function (error) {
                 alert(error.response.data)
                 return;
@@ -265,7 +265,84 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
             <DropDownMenu values={studentNames} onChange={onPersonChange} />
             <HeaderText>Изберете оценка</HeaderText>
             <DropDownMenuMarks values={marks} onChange={onMarkChange} />
-            <SubmitButton onClick={removeMark}>Запиши оценка</SubmitButton>
+            <SubmitButton isForDelete={true} onClick={removeMark}>Изтрий оценка</SubmitButton>
+        </BoxContainer>
+    )
+}
+
+export function RemoveAbsence({ hasToRefresh, absences }) {
+    var selectedPerson = '';
+
+    const [selPerson, setSelPerson] = useState('');
+    const [selAbsence, setSelAbsence] = useState([]);
+
+    const userJSON = JSON.parse(localStorage.getItem('user'))
+    const [dates, setDates] = useState([])
+
+    let students = []
+    let absencesData = []
+
+    absences.map(function (item, index, array) {
+        absencesData.push(item)
+    })
+
+    absencesData.map(function (item, index, array) {
+        if (!students.includes(item.studentName))
+            students.push(item.studentName)
+    })
+
+    function onPersonChange(value) {
+        setSelPerson(value)
+        selectedPerson = value
+
+        setDates([])
+        students.map(function (item, index, array) {
+            if (item.names === value) {
+                selectedPerson = item
+                setSelPerson(item)
+            }
+        })
+
+        let tempArr = []
+        absences.map(function (item, index, array) {
+            if (item.studentName === value) {
+                tempArr.push({ date: timeConverter(item.date), id: item.id })
+            }
+        })
+        setDates(tempArr)
+    }
+
+    function onAbsenceChange(value) {
+        setSelAbsence(value)
+    }
+
+    function removeAbsence() {
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (selAbsence === undefined) {
+            alert("Не сте избрали оценка.")
+            return;
+        }
+
+        axios.delete('http://localhost:8080/teacher/absence/delete?teacherId=' + userJSON.id + '&id=' + selAbsence.id)
+            .catch(function (error) {
+                alert(error.response.data)
+                return;
+            })
+
+        hasToRefresh();
+    }
+
+    return (
+        <BoxContainer>
+            <HeaderText>Изберете ученик</HeaderText>
+            <DropDownMenu values={students} onChange={onPersonChange} />
+            <HeaderText>Изберете оценка</HeaderText>
+            <DropDownMenuAbsences values={dates} onChange={onAbsenceChange} />
+            <SubmitButton isForDelete={true} onClick={removeAbsence}>Изтрий остъствие</SubmitButton>
         </BoxContainer>
     )
 }

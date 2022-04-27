@@ -171,6 +171,7 @@ public class StudentController {
             for (Absence absence : student.getAbsences()) {
                 if (absence.getSubject() == subject) {
                     studentAbsenceList.add(new StudentAbsenceModel(
+                            absence.getId(),
                             student.getFirstName() + " " + student.getMiddleName() + " " +
                                     student.getLastName(),
                             absence.isAbsence(), absence.isExcused(), absence.getDate()

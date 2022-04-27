@@ -358,7 +358,7 @@ export function GetStudentsGradesTable({ rawData }) {
     )
 }
 
-export function GetStudentsAbsencesTable({ rawData }) {
+export function GetStudentsAbsencesTable({ hasToRefresh, rawData }) {
 
     let studentsAbsences = [];
 

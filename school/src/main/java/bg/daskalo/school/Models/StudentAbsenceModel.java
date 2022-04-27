@@ -3,12 +3,14 @@ package bg.daskalo.school.Models;
 import java.util.Date;
 
 public class StudentAbsenceModel {
+    private Long id;
     private String studentName;
     private boolean isAbsence;
     private boolean isExcused;
     private Date date;
 
-    public StudentAbsenceModel(String studentName, boolean isAbsence, boolean isExcused, Date date) {
+    public StudentAbsenceModel(Long id, String studentName, boolean isAbsence, boolean isExcused, Date date) {
+        this.id = id;
         this.studentName = studentName;
         this.isAbsence = isAbsence;
         this.isExcused = isExcused;
@@ -45,5 +47,13 @@ public class StudentAbsenceModel {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

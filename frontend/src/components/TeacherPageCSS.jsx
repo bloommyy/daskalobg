@@ -49,7 +49,7 @@ export const SubmitButton = styled.button`
     position: absolute;
     right: 0.9%;
 
-    background: #0f0;
+    background: ${props => (props.isForDelete ? '#f00' : '#0f0')};
     color: ${props => (props.selected ? '#fff' : 'black')};
 
     &:hover{
