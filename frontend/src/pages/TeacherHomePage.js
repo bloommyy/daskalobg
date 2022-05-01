@@ -3,7 +3,7 @@ import { Button, Form, TeacherButton } from '../components/HomePageCSS';
 import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetStudentsFeedbacksTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence } from '../components/TeacherComponents';
+import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence, RemoveFeedback } from '../components/TeacherComponents';
 import { set } from 'lodash';
 
 export function TeacherHomePage() {
@@ -29,6 +29,8 @@ export function TeacherHomePage() {
     const [removeFeedback, setRemoveFeedback] = useState(false);
 
     const [marks, setMarks] = useState([]);
+
+    const [toRefresh, setToRefresh] = useState(true)
 
     var selectedClass = '';
 
@@ -65,6 +67,7 @@ export function TeacherHomePage() {
                     setAbsences(false);
                     setFeedback(false);
                     setGrades(true)
+                    setToRefresh(refresh => !refresh)
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -235,6 +238,29 @@ export function TeacherHomePage() {
                 })
     }
 
+    function onRemoveFeedback() {
+        if (selClass !== '')
+            axios.get('http://localhost:8080/student/feedbacks/byClassAndSubject?stClass=' + selClass + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    if (typeof response.data === 'undefined') {
+                        alert("Нещо се обърка.")
+                        return;
+                    }
+
+                    setFeedbacksData(response.data)
+                    setAddNewAbsence(false)
+                    setAddNewMark(false)
+                    setAddNewFeedback(false)
+                    setRemoveMark(false)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(!removeFeedback)
+                })
+                .catch(function (error) {
+                    alert(error.response.data)
+                    return;
+                })
+    }
+
     return (
         <Form>
             <Nav classes={classes} selectedClassChanged={onChange} />
@@ -246,7 +272,7 @@ export function TeacherHomePage() {
             <TeacherButton isForAdding={true} selected={addNewFeedback} onClick={onAddNewFeedback} width='32.5%'>Добавете Забележка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeMark} onClick={onRemoveMark} width='32.5%'>Премахнете Оценка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeAbsence} onClick={onRemoveAbsence} width='32.5%'>Премахнете Остъствие</TeacherButton>
-            <TeacherButton isForAdding={false} selected={removeFeedback} width='32.5%'>Премахнете Забележка</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeFeedback} onClick={onRemoveFeedback} width='32.5%'>Премахнете Забележка</TeacherButton>
             {
                 removeMark && <RemoveMark hasToRefresh={onGrades} students={students} grades={gradesData} />
             }
@@ -254,7 +280,7 @@ export function TeacherHomePage() {
                 removeAbsence && <RemoveAbsence hasToRefresh={onAbsences} students={students} absences={absencesData} ></RemoveAbsence>
             }
             {
-                removeFeedback && <button></button>
+                removeFeedback && <RemoveFeedback hasToRefresh={onFeedback} feedbacksData={feedbacksData}></RemoveFeedback>
             }
             {
                 addNewMark && <AddNewMark hasToRefresh={onGrades} students={students} />
@@ -266,7 +292,7 @@ export function TeacherHomePage() {
                 addNewFeedback && <AddNewFeedback hasToRefresh={onFeedback} students={students} />
             }
             {
-                grades && <GetStudentsGradesTable rawData={gradesData} />
+                grades && <GetStudentsGradesTable refresh={toRefresh} rawData={gradesData} />
             }
             {
                 absences && <GetStudentsAbsencesTable rawData={absencesData} />

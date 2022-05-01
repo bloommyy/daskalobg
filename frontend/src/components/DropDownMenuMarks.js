@@ -19,3 +19,13 @@ export const DropDownMenuAbsences = ({ values, onChange }) => {
         </section>
     );
 };
+
+export const DropDownMenuFeedbacks = ({ values, onChange }) => {
+    return (
+        <section className="k-my-8">
+            <form className="k-form">
+                <DropDownList data={values} textField="description" dataItemKey="id" onChange={e => onChange(e.value)} />
+            </form>
+        </section>
+    );
+};

@@ -200,6 +200,7 @@ public class StudentController {
             for (Feedback feedback : student.getFeedbacks()) {
                 if (feedback.getSubject() == subject) {
                     studentFeedackList.add(new StudentFeedbackModel(
+                            feedback.getId(),
                             student.getFirstName() + " " + student.getMiddleName() + " " +
                                     student.getLastName(),
                             feedback.getDescription(), feedback.getDate()

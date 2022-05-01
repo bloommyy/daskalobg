@@ -1,6 +1,6 @@
 import { BoxContainer, HeaderText, SubmitButton, Input } from './TeacherPageCSS';
 import { DropDownMenu } from '../components/DropDownMenu';
-import { DropDownMenuAbsences, DropDownMenuMarks } from './DropDownMenuMarks';
+import { DropDownMenuFeedbacks, DropDownMenuAbsences, DropDownMenuMarks } from './DropDownMenuMarks';
 import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
@@ -250,7 +250,9 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
             return;
         }
 
-        axios.delete('http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + selMark.id === undefined ? selectedMark : selMark.id)
+        let link = 'http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + (selMark.id === undefined ? selectedMark : selMark.id)
+
+        axios.delete(link)
             .catch(function (error) {
                 alert(error.response.data)
                 return;
@@ -323,7 +325,7 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
         }
 
         if (selAbsence === undefined) {
-            alert("Не сте избрали оценка.")
+            alert("Не сте избрали отсъствие.")
             return;
         }
 
@@ -340,9 +342,83 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
         <BoxContainer>
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={students} onChange={onPersonChange} />
-            <HeaderText>Изберете оценка</HeaderText>
+            <HeaderText>Изберете дата на </HeaderText>
             <DropDownMenuAbsences values={dates} onChange={onAbsenceChange} />
             <SubmitButton isForDelete={true} onClick={removeAbsence}>Изтрий остъствие</SubmitButton>
+        </BoxContainer>
+    )
+}
+
+export function RemoveFeedback({ hasToRefresh, feedbacksData }) {
+
+    console.log(feedbacksData)
+
+    var selectedPerson = '';
+
+    const [selPerson, setSelPerson] = useState('');
+    const [selFeedback, setSelFeedback] = useState([]);
+
+    const [feedbacks, setFeedbacks] = useState([])
+
+    const userJSON = JSON.parse(localStorage.getItem('user'))
+    let students = []
+    feedbacksData.map(function (item, index, array) {
+        if (!students.includes(item.studentName))
+            students.push(item.studentName)
+    })
+
+    function onPersonChange(value) {
+        setSelPerson(value)
+        selectedPerson = value
+
+        setFeedbacks([])
+        feedbacksData.map(function (item, index, array) {
+            if (item.studentName === value) {
+                selectedPerson = item
+                setSelPerson(item)
+            }
+        })
+
+        let tempArr = []
+        feedbacksData.map(function (item, index, array) {
+            if (item.studentName === value) {
+                tempArr.push({ description: item.description, id: item.id })
+            }
+        })
+        setFeedbacks(tempArr)
+    }
+
+    function onFeedbackChange(value) {
+        setSelFeedback(value)
+    }
+
+    function removeFeedback() {
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (selFeedback === undefined) {
+            alert("Не сте избрали забележка.")
+            return;
+        }
+
+        axios.delete('http://localhost:8080/teacher/feedback/delete?teacherId=' + userJSON.id + '&id=' + selFeedback.id)
+            .catch(function (error) {
+                alert(error.response.data)
+                return;
+            })
+
+        hasToRefresh();
+    }
+
+    return (
+        <BoxContainer>
+            <HeaderText>Изберете ученик</HeaderText>
+            <DropDownMenu values={students} onChange={onPersonChange} />
+            <HeaderText>Изберете забележка</HeaderText>
+            <DropDownMenuFeedbacks values={feedbacks} onChange={onFeedbackChange} />
+            <SubmitButton isForDelete={true} onClick={removeFeedback}>Изтрий забележка</SubmitButton>
         </BoxContainer>
     )
 }

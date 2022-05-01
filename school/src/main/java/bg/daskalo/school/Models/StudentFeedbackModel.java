@@ -3,11 +3,13 @@ package bg.daskalo.school.Models;
 import java.util.Date;
 
 public class StudentFeedbackModel {
+    private Long id;
     private String studentName;
     private String description;
     private Date date;
 
-    public StudentFeedbackModel(String studentName, String description, Date date) {
+    public StudentFeedbackModel(Long id, String studentName, String description, Date date) {
+        this.id = id;
         this.studentName = studentName;
         this.description = description;
         this.date = date;
@@ -35,5 +37,13 @@ public class StudentFeedbackModel {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
