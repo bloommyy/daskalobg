@@ -33,3 +33,9 @@ export function yearlyMean(firstTerm, secondTerm) {
 
     return ((mark) / 2).toPrecision(3);
 }
+
+export class TableType {
+    static Grades = 0;
+    static Absences = 1;
+    static Feedbacks = 2;
+}

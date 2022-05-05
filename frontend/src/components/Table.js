@@ -2,7 +2,78 @@ import React from 'react';
 import { useTable } from 'react-table';
 import { Styles } from './HomePageCSS';
 import _ from 'lodash';
-import { timeConverter, mean, yearlyMean } from '../utils';
+import { timeConverter, mean, yearlyMean, TableType } from '../utils';
+
+const COLUMNS_FEEDBACKS = [
+    {
+        Header: 'Студент',
+        accessor: 'studentName'
+    },
+    {
+        Header: 'Описание',
+        accessor: 'description'
+    },
+    {
+        Header: 'Дата',
+        accessor: 'date'
+    }
+]
+
+const COLUMNS_ABSENCES = [
+    {
+        Header: 'Студент',
+        accessor: 'student'
+    },
+    {
+        Header: 'Тип',
+        accessor: 'type'
+    },
+    {
+        Header: 'Извинено',
+        accessor: 'excused'
+    },
+    {
+        Header: 'Дата',
+        accessor: 'date'
+    }
+]
+
+const COLUMNS_GRADES = [
+    {
+        Header: 'Ученик',
+        accessor: 'studentNames'
+    },
+    {
+        Header: 'Първи срок',
+        columns: [
+            {
+                Header: 'Текущи',
+                accessor: 'firstTerm',
+            },
+            {
+                Header: 'Срочна',
+                accessor: 'firstTermFinal',
+            },
+        ]
+    },
+    {
+        Header: 'Втори срок',
+        columns: [
+            {
+                Header: 'Текущи',
+                accessor: 'secondTerm',
+            },
+            {
+                Header: 'Срочна',
+                accessor: 'secondTermFinal',
+            },
+        ]
+    },
+    {
+        Header: 'Годишна',
+        accessor: 'yearly'
+    }
+]
 
 function Table({ columns, data }) {
     const {
@@ -263,51 +334,8 @@ export function GetFeedbacksTable({ rawData }) {
 
 export function GetStudentsGradesTable({ rawData }) {
 
-    let studentsMarks = [];
-
-    studentsMarks = rawData.reduce((acc, el) => {
-        let findIndex = acc.findIndex(accEl => accEl.studentName === el.studentName);
-        let temparr = acc;
-        if (findIndex > -1) {
-            temparr[findIndex] = {
-                studentName: temparr[findIndex].studentName,
-                firstTerm: el.term === 1 ? '' + (temparr[findIndex].firstTerm.toString() === ''
-                    ? temparr[findIndex].firstTerm.toString().concat(el.mark)
-                    : temparr[findIndex].firstTerm.toString().concat(", " + el.mark)) : temparr[findIndex].firstTerm,
-                firstTermFinal: el.term === 1 ? el.mark : '0',
-                secondTerm: el.term === 2 ? '' + (temparr[findIndex].secondTerm.toString() === ''
-                    ? temparr[findIndex].secondTerm.toString().concat(el.mark)
-                    : temparr[findIndex].secondTerm.toString().concat(", " + el.mark)) : temparr[findIndex].secondTerm,
-                secondTermFinal: el.term === 2 ? el.mark : '0',
-                yearly: '',
-            }
-        } else {
-            temparr.push({
-                studentName: el.studentName,
-                firstTerm: el.term === 1 ? el.mark : '',
-                firstTermFinal: el.term === 1 ? el.mark : '',
-                secondTerm: el.term === 2 ? el.mark : '',
-                secondTermFinal: el.term === 2 ? el.mark : '',
-            });
-        }
-
-        return temparr;
-    }, [])
-
-    studentsMarks.map(function (currentValue, index, arr) {
-        let mark = currentValue.firstTerm.split(', ').reverse().join(', ')
-        currentValue.firstTerm = mark
-
-        mark = currentValue.secondTerm.split(', ').reverse().join(', ')
-        currentValue.secondTerm = mark
-
-        currentValue.firstTermFinal = mean(currentValue.firstTerm)
-        currentValue.secondTermFinal = mean(currentValue.secondTerm)
-        currentValue.yearly = yearlyMean(currentValue.firstTermFinal, currentValue.secondTermFinal)
-    })
-
     const data = React.useMemo(
-        () => studentsMarks,
+        () => rawData,
         []
     )
 
@@ -315,7 +343,7 @@ export function GetStudentsGradesTable({ rawData }) {
         () => [
             {
                 Header: 'Ученик',
-                accessor: 'studentName'
+                accessor: 'studentNames'
             },
             {
                 Header: 'Първи срок',
@@ -446,3 +474,34 @@ export function GetStudentsFeedbacksTable({ rawData }) {
         </Styles>
     )
 }
+
+export function GetTable({ prepData, type }) {
+    const data = React.useMemo(
+        () => prepData,
+        []
+    )
+
+    const columns = React.useMemo(
+        () => {
+            switch (type) {
+                case TableType.Grades:
+                    return COLUMNS_GRADES
+                case TableType.Absences:
+                    return COLUMNS_ABSENCES
+                case TableType.Feedbacks:
+                    return COLUMNS_FEEDBACKS
+                default:
+                    alert("Няма такъв тип таблица.")
+                    throw Error("Invalid type.")
+            }
+        },
+        []
+    )
+
+    return (
+        <Styles>
+            <Table columns={columns} data={data} />
+        </Styles>
+    )
+}
+

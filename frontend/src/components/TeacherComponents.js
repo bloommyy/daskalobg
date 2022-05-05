@@ -5,6 +5,7 @@ import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
 import { timeConverter } from '../utils';
+import { MicNone } from '@mui/icons-material';
 
 export function AddNewMark({ students, hasToRefresh }) {
 
@@ -197,36 +198,40 @@ export function AddNewFeedback({ students, hasToRefresh }) {
     )
 }
 
-export function RemoveMark({ students, hasToRefresh, grades }) {
+export function RemoveMark({ hasToRefresh, grades }) {
     var selectedPerson = '';
-    var selectedMark = '';
+    var selectedMark = -1;
 
     const [selPerson, setSelPerson] = useState('');
-    const [selMark, setSelMark] = useState('');
+    const [selMark, setSelMark] = useState(-1);
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
     const [marks, setMarks] = useState([])
 
+    const studentNames = []
+    grades.map(function (item, index, array) {
+        studentNames.push(item.studentNames)
+    })
+
     function onPersonChange(value) {
-        students.map(function (item, index, array) {
-            if (item.names === value) {
+        setMarks([])
+        grades.map(function (item, index, array) {
+            if (item.studentNames === value) {
                 selectedPerson = item
                 setSelPerson(item)
-            }
-        })
+                let firstTermMarks = item.firstTerm.split(', ')
+                let secondTermMarks = item.secondTerm.split(', ')
+                let allMarks = firstTermMarks.concat(secondTermMarks)
+                allMarks = allMarks.filter(n => n)
+                let allMarkIndexes = item.firstTermIds.concat(item.secondTermIds)
 
-        let temp = []
-        grades.map(function (item, index, array) {
-            if (item.studentName === value && item.term === 2) {
-                temp.push(item)
+                let temp = []
+                for (let i = 0; i < allMarks.length; i++) {
+                    temp.push({ id: allMarkIndexes[i], mark: allMarks[i] })
+                }
+                setMarks(temp)
             }
         })
-        grades.map(function (item, index, array) {
-            if (item.studentName === value && item.term === 1) {
-                temp.push(item)
-            }
-        })
-        setMarks(temp.reverse())
     }
 
     function onMarkChange(value) {
@@ -234,17 +239,12 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
         setSelMark(value)
     }
 
-    const studentNames = []
-    students.map(function (item, index, array) {
-        studentNames.push(item.names)
-    })
-
     function removeMark() {
         if (selectedPerson === '' && selPerson === '') {
             alert("Не сте избрали ученик.")
             return;
         }
-
+        console.log(selectedMark, selMark)
         if (selectedMark === -1 && selMark === -1) {
             alert("Не сте избрали оценка.")
             return;
@@ -258,6 +258,14 @@ export function RemoveMark({ students, hasToRefresh, grades }) {
                 return;
             })
 
+        let temp = []
+        marks.map(function (item, index, array) {
+            let id = selMark.id === undefined ? selectedMark : selMark.id
+            if (id !== item.id)
+                temp.push(item)
+        })
+
+        setMarks(temp)
         hasToRefresh();
     }
 
@@ -361,6 +369,7 @@ export function RemoveFeedback({ hasToRefresh, feedbacksData }) {
     const [feedbacks, setFeedbacks] = useState([])
 
     const userJSON = JSON.parse(localStorage.getItem('user'))
+
     let students = []
     feedbacksData.map(function (item, index, array) {
         if (!students.includes(item.studentName))

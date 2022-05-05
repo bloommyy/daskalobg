@@ -7,6 +7,7 @@ import bg.daskalo.school.Models.StudentFeedbackModel;
 import bg.daskalo.school.Models.StudentMarkModel;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.*;
+import bg.daskalo.school.Utils.HelpfulThings;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -138,17 +140,63 @@ public class StudentController {
 
         List<StudentMarkModel> studentMarkList = new ArrayList<>();
 
+        int currStudent = 0;
         for (Student student : students) {
+            studentMarkList.add(new StudentMarkModel(student.getFirstName() + " " + student.getMiddleName() + " " +
+                    student.getLastName()));
+
+            ArrayList<Integer> firstTermMarks = new ArrayList<>();
+            ArrayList<Integer> secondTermMarks = new ArrayList<>();
+            StudentMarkModel model =  studentMarkList.get(currStudent);
+            ArrayList<Long> firstTermIds = new ArrayList<>();
+            ArrayList<Long> secondTermIds = new ArrayList<>();
             for (Mark mark : student.getMarks()) {
-                if (mark.getSubject() == subject) {
-                    studentMarkList.add(new StudentMarkModel(
-                            mark.getId(),
-                            student.getFirstName() + " " + student.getMiddleName() + " " +
-                                    student.getLastName(),
-                            mark.getMark(), mark.getTerm()
-                    ));
+                if(mark.getTerm() == 1){
+                    firstTermIds.add(mark.getId());
+                    firstTermMarks.add(mark.getMark());
+                }
+                else{
+                    secondTermIds.add(mark.getId());
+                    secondTermMarks.add(mark.getMark());
                 }
             }
+            firstTermMarks = HelpfulThings.ReverseList(firstTermMarks);
+            secondTermMarks = HelpfulThings.ReverseList(secondTermMarks);
+            model.setFirstTermIds(HelpfulThings.ReverseList(firstTermIds));
+            model.setSecondTermIds(HelpfulThings.ReverseList(secondTermIds));
+
+            String firstTerm = firstTermMarks.toString();
+            model.setFirstTerm(firstTerm.substring(1, firstTerm.length()-1));
+
+            DecimalFormat df = new DecimalFormat();
+            df.setMaximumFractionDigits(2);
+
+            double sum = 0;
+            double firstTermDouble = 0;
+            double secondTermDouble = 0;
+            for (Integer mark : firstTermMarks)
+                sum += mark;
+
+            if (sum != 0){
+                firstTermDouble = sum/firstTermMarks.size();
+                model.setFirstTermFinal(df.format(firstTermDouble));
+            }
+
+            String secondTerm = secondTermMarks.toString();
+            model.setSecondTerm(secondTerm.substring(1, secondTerm.length()-1));
+
+            sum = 0;
+            for (Integer mark : secondTermMarks)
+                sum += mark;
+            if (sum != 0){
+                secondTermDouble = sum/secondTermMarks.size();
+                model.setSecondTermFinal(df.format(secondTermDouble));
+            }
+
+            if (secondTermDouble != 0)
+                model.setYearly(df.format((firstTermDouble + secondTermDouble) / 2));
+
+            currStudent++;
         }
 
         return ResponseEntity.ok(studentMarkList);
@@ -203,7 +251,7 @@ public class StudentController {
                             feedback.getId(),
                             student.getFirstName() + " " + student.getMiddleName() + " " +
                                     student.getLastName(),
-                            feedback.getDescription(), feedback.getDate()
+                            feedback.getDescription(), HelpfulThings.TimeConvert(feedback.getDate())
                     ));
                 }
             }

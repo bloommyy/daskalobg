@@ -1,47 +1,82 @@
 package bg.daskalo.school.Models;
 
+import java.util.ArrayList;
+
 public class StudentMarkModel {
-    private Long id;
-    private String studentName;
-    private Integer mark;
-    private Integer term;
+    private ArrayList<Long> firstTermIds;
+    private ArrayList<Long> secondTermIds;
+    private String studentNames;
+    private String firstTerm;
+    private String firstTermFinal;
+    private String secondTerm;
+    private String secondTermFinal;
+    private String yearly;
 
-    public StudentMarkModel(Long id, String studentName, Integer mark, Integer term) {
-        this.id = id;
-        this.studentName = studentName;
-        this.mark = mark;
-        this.term = term;
+    public StudentMarkModel(String studentNames) {
+        this.studentNames = studentNames;
     }
 
-    public Long getId() {
-        return id;
+    public ArrayList<Long> getFirstTermIds() {
+        return firstTermIds;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setFirstTermIds(ArrayList<Long> firstTermIds) {
+        this.firstTermIds = firstTermIds;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public ArrayList<Long> getSecondTermIds() {
+        return secondTermIds;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setSecondTermIds(ArrayList<Long> secondTermIds) {
+        this.secondTermIds = secondTermIds;
     }
 
-    public Integer getMark() {
-        return mark;
+    public String getStudentNames() {
+        return studentNames;
     }
 
-    public void setMark(Integer mark) {
-        this.mark = mark;
+    public void setStudentNames(String studentName) {
+        this.studentNames = studentName;
     }
 
-    public Integer getTerm() {
-        return term;
+    public String getFirstTerm() {
+        return firstTerm;
     }
 
-    public void setTerm(Integer term) {
-        this.term = term;
+    public void setFirstTerm(String firstTerm) {
+        this.firstTerm = firstTerm;
+    }
+
+    public String getFirstTermFinal() {
+        return firstTermFinal;
+    }
+
+    public void setFirstTermFinal(String firstTermFinal) {
+        this.firstTermFinal = firstTermFinal;
+    }
+
+    public String getSecondTerm() {
+        return secondTerm;
+    }
+
+    public void setSecondTerm(String secondTerm) {
+        this.secondTerm = secondTerm;
+    }
+
+    public String getSecondTermFinal() {
+        return secondTermFinal;
+    }
+
+    public void setSecondTermFinal(String secondTermFinal) {
+        this.secondTermFinal = secondTermFinal;
+    }
+
+    public String getYearly() {
+        return yearly;
+    }
+
+    public void setYearly(String yearly) {
+        this.yearly = yearly;
     }
 }

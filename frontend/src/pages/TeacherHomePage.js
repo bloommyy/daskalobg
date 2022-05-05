@@ -1,10 +1,11 @@
 import Nav from '../components/TeacherAppNavBar';
 import { Button, Form, TeacherButton } from '../components/HomePageCSS';
-import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetStudentsFeedbacksTable } from '../components/Table';
+import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence, RemoveFeedback } from '../components/TeacherComponents';
 import { set } from 'lodash';
+import { TableType } from '../utils'
 
 export function TeacherHomePage() {
     const [grades, setGrades] = useState(false);
@@ -292,13 +293,13 @@ export function TeacherHomePage() {
                 addNewFeedback && <AddNewFeedback hasToRefresh={onFeedback} students={students} />
             }
             {
-                grades && <GetStudentsGradesTable refresh={toRefresh} rawData={gradesData} />
+                grades && <GetTable refresh={toRefresh} prepData={gradesData} type={TableType.Grades} />
             }
             {
                 absences && <GetStudentsAbsencesTable rawData={absencesData} />
             }
             {
-                feedbacks && <GetStudentsFeedbacksTable rawData={feedbacksData} />
+                feedbacks && <GetTable prepData={feedbacksData} type={TableType.Feedbacks} />
             }
         </Form>
     )
