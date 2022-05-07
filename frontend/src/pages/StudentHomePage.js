@@ -1,6 +1,6 @@
 import Nav from '../components/StudentAppNavBar';
 import { Button, Form } from '../components/HomePageCSS';
-import { GetAbsencesTable, GetFeedbacksTable, GetTable } from '../components/Table';
+import { GetTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { TableType } from '../utils'

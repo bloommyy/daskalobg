@@ -33,7 +33,7 @@ export default connect(({ error }) => ({ error }), { login })(props => {
             </TopContainer>
             <InnerContainer>
                 <FormContainer>
-                    <div id='loginEmail'>
+                    <div>
                         <div id='loginIcon'>
                             <PersonIcon fontSize='large' />
                         </div>

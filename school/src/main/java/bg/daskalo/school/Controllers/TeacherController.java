@@ -220,7 +220,7 @@ public class TeacherController {
         return new ResponseEntity<>(studentAbsenceList, HttpStatus.CREATED);
     }
 
-    @PostMapping("/absence/excuse")
+    @PutMapping("/absence/excuse")
     public ResponseEntity<?> excuseAbsence(@RequestParam(value = "teacherId") UUID teacherId, Long id) {
         if(id == null)
             return new ResponseEntity<>("id is invalid.", HttpStatus.BAD_REQUEST);
@@ -243,7 +243,12 @@ public class TeacherController {
 
         absenceRepo.save(excuseAbsence);
 
-        return ResponseEntity.ok("Excused absence on date " + excuseAbsence.getDate() + ".");
+        String stClass = excuseAbsence.getStudent().getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentAbsenceModel> studentAbsenceList = HelpfulThings.ProcessAbsences(students, teacher.getSubject());
+
+        return ResponseEntity.ok(studentAbsenceList);
     }
 
     @DeleteMapping("/absence/delete")

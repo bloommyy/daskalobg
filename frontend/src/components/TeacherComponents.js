@@ -1,10 +1,10 @@
 import { BoxContainer, HeaderText, SubmitButton, Input } from './TeacherPageCSS';
 import { DropDownMenu } from '../components/DropDownMenu';
-import { DropDownMenuFeedbacks, DropDownMenuAbsences, DropDownMenuMarks } from './DropDownMenuMarks';
+import { DropDownMenuSpecialized } from './DropDownMenuSpecialized';
 import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
-import { timeConverter } from '../utils';
+import { DropDownType } from '../utils';
 
 export function AddNewMark({ students, updateData, addMark }) {
 
@@ -280,7 +280,7 @@ export function RemoveMark({ updateData, grades }) {
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={studentNames} onChange={onPersonChange} />
             <HeaderText>Изберете оценка</HeaderText>
-            <DropDownMenuMarks values={marks} onChange={onMarkChange} />
+            <DropDownMenuSpecialized values={dates} type={DropDownType.Marks} onChange={onMarkChange} />
             <SubmitButton isForDelete={true} onClick={removeMark}>Изтрий оценка</SubmitButton>
         </BoxContainer>
     )
@@ -364,7 +364,7 @@ export function RemoveAbsence({ updateData, absences }) {
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={students} onChange={onPersonChange} />
             <HeaderText>Изберете дата на </HeaderText>
-            <DropDownMenuAbsences values={dates} onChange={onAbsenceChange} />
+            <DropDownMenuSpecialized values={dates} type={DropDownType.Absences} onChange={onAbsenceChange} />
             <SubmitButton isForDelete={true} onClick={removeAbsence}>Изтрий остъствие</SubmitButton>
         </BoxContainer>
     )
@@ -437,8 +437,115 @@ export function RemoveFeedback({ updateData, feedbacksData }) {
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={students} onChange={onPersonChange} />
             <HeaderText>Изберете забележка</HeaderText>
-            <DropDownMenuFeedbacks values={feedbacks} onChange={onFeedbackChange} />
+            <DropDownMenuSpecialized values={feedbacks} type={DropDownType.Feedbacks} onChange={onFeedbackChange} />
             <SubmitButton isForDelete={true} onClick={removeFeedback}>Изтрий забележка</SubmitButton>
+        </BoxContainer>
+    )
+}
+
+export function ExcuseAbsence({ updateData, absences }) {
+    var selectedPerson = '';
+
+    const [selPerson, setSelPerson] = useState('');
+    const [selAbsence, setSelAbsence] = useState([]);
+
+    const userJSON = JSON.parse(localStorage.getItem('user'))
+    const [dates, setDates] = useState([])
+
+    let students = []
+    let absencesData = []
+
+    absences.map(function (item, index, array) {
+        absencesData.push(item)
+    })
+
+    absencesData.map(function (item, index, array) {
+        if (!students.includes(item.studentNames))
+            students.push(item.studentNames)
+    })
+
+    function onPersonChange(value) {
+        setSelPerson(value)
+        selectedPerson = value
+
+        setDates([])
+        students.map(function (item, index, array) {
+            if (item.names === value) {
+                selectedPerson = item
+                setSelPerson(item)
+            }
+        })
+
+        let tempArr = []
+        absences.map(function (item, index, array) {
+            if (item.studentNames === value && item.isExcused === 'Не' && item.type === 'Отсъствие') {
+                tempArr.push({ date: item.date, id: item.id })
+            }
+        })
+        setDates(tempArr)
+    }
+
+    function onAbsenceChange(value) {
+        setSelAbsence(value)
+    }
+
+    function excuseAbsence() {
+        if (selectedPerson === '' && selPerson === '') {
+            alert("Не сте избрали ученик.")
+            return;
+        }
+
+        if (selAbsence === undefined) {
+            alert("Не сте избрали отсъствие.")
+            return;
+        }
+
+        let isAbsence = true;
+        let isExcused = false;
+        dates.map(function (item, index, array) {
+            absences.map(function (item1, index1, array1) {
+                if (item.id === item1.id)
+                    if (item1.type !== 'Отсъствие')
+                        isAbsence = false;
+
+                if (item1.isExcused === 'Да')
+                    isExcused = true;
+            })
+        })
+
+        if (!isAbsence) {
+            alert("Не можете да извините закъснение.")
+            return;
+        }
+
+        if (isExcused) {
+            alert("Не можете да извините извинено отсъствие.")
+            return;
+        }
+
+        axios.put('http://localhost:8080/teacher/absence/excuse?teacherId=' + userJSON.id + '&id=' + selAbsence.id)
+            .then(function (response) {
+                updateData(response.data)
+                let temp = []
+                dates.map(function (item, index, array) {
+                    if (item.id != selAbsence.id)
+                        temp.push(item)
+                })
+                setDates(temp)
+            })
+            .catch(function (error) {
+                alert(error.response.data)
+                return;
+            })
+    }
+
+    return (
+        <BoxContainer>
+            <HeaderText>Изберете ученик</HeaderText>
+            <DropDownMenu values={students} onChange={onPersonChange} />
+            <HeaderText>Изберете дата на </HeaderText>
+            <DropDownMenuSpecialized values={dates} type={DropDownType.Absences} onChange={onAbsenceChange} />
+            <SubmitButton isForDelete={false} onClick={excuseAbsence}>Извини остъствие</SubmitButton>
         </BoxContainer>
     )
 }

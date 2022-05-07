@@ -1,10 +1,9 @@
 import Nav from '../components/TeacherAppNavBar';
 import { Button, Form, TeacherButton } from '../components/HomePageCSS';
-import { GetStudentsGradesTable, GetStudentsAbsencesTable, GetTable } from '../components/Table';
+import { GetTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence, RemoveFeedback } from '../components/TeacherComponents';
-import { set } from 'lodash';
+import { AddNewAbsence, AddNewMark, AddNewFeedback, RemoveMark, RemoveAbsence, RemoveFeedback, ExcuseAbsence } from '../components/TeacherComponents';
 import { TableType } from '../utils'
 
 export function TeacherHomePage() {
@@ -23,6 +22,7 @@ export function TeacherHomePage() {
 
     const [addNewMark, setAddNewMark] = useState(false);
     const [addNewAbsence, setAddNewAbsence] = useState(false);
+    const [excuseAbsence, setExcuseAbsence] = useState(false);
     const [addNewFeedback, setAddNewFeedback] = useState(false);
 
     const [removeMark, setRemoveMark] = useState(false);
@@ -123,6 +123,7 @@ export function TeacherHomePage() {
                     setStudents(tempStudents);
                     setAddNewMark(!addNewMark)
                     setAddNewAbsence(false)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(false)
                     setRemoveMark(false)
                     setRemoveAbsence(false)
@@ -149,6 +150,7 @@ export function TeacherHomePage() {
                     setStudents(tempStudents);
                     setAddNewMark(false)
                     setAddNewAbsence(!addNewAbsence)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(false)
                     setRemoveMark(false)
                     setRemoveAbsence(false)
@@ -159,6 +161,34 @@ export function TeacherHomePage() {
                     return;
                 })
         }
+    }
+
+    function onExcuseAbsence() {
+        if (selClass !== '')
+            axios.get('http://localhost:8080/student/absences/byClassAndSubject?stClass=' + selClass + "&sjId=" + userJSON.subject.id)
+                .then(function (response) {
+                    if (typeof response.data === 'undefined')
+                        return;
+
+                    setAbsencesData(response.data);
+                    setAddNewMark(false)
+                    setAddNewAbsence(false)
+                    setExcuseAbsence(!excuseAbsence)
+                    setAddNewFeedback(false)
+                    setRemoveMark(false)
+                    setRemoveAbsence(false)
+                    setRemoveFeedback(false)
+                    if (!removeAbsence) {
+                        setGrades(false)
+                        setAbsences(true)
+                        setFeedback(false)
+                        onAbsences()
+                    }
+                })
+                .catch(function (error) {
+                    alert(error.response.data)
+                    return;
+                })
     }
 
     function onAddNewFeedback() {
@@ -176,6 +206,7 @@ export function TeacherHomePage() {
                     setStudents(tempStudents);
                     setAddNewMark(false)
                     setAddNewAbsence(false)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(!addNewFeedback)
                     setRemoveMark(false)
                     setRemoveAbsence(false)
@@ -202,6 +233,7 @@ export function TeacherHomePage() {
                     setStudents(tempStudents)
                     setAddNewMark(false)
                     setAddNewAbsence(false)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(false)
                     setRemoveMark(!removeMark)
                     setRemoveAbsence(false)
@@ -227,8 +259,9 @@ export function TeacherHomePage() {
                         return;
 
                     setAbsencesData(response.data);
-                    setAddNewAbsence(false)
                     setAddNewMark(false)
+                    setAddNewAbsence(false)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(false)
                     setRemoveMark(false)
                     setRemoveAbsence(!removeAbsence)
@@ -256,8 +289,9 @@ export function TeacherHomePage() {
                     }
 
                     setFeedbacksData(response.data)
-                    setAddNewAbsence(false)
                     setAddNewMark(false)
+                    setAddNewAbsence(false)
+                    setExcuseAbsence(false)
                     setAddNewFeedback(false)
                     setRemoveMark(false)
                     setRemoveAbsence(false)
@@ -282,7 +316,8 @@ export function TeacherHomePage() {
             <Button onClick={onAbsences} width='32.5%' selected={absences}>Отсъствия</Button>
             <Button onClick={onFeedback} width='32.5%' selected={feedbacks}>Забележки</Button>
             <TeacherButton isForAdding={true} selected={addNewMark} onClick={onAddNewMark} width='32.5%'>Добавете Оценка</TeacherButton>
-            <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='32.5%'>Добавете Отсъствие</TeacherButton>
+            <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='15.85%'>Добавете Отсъствие</TeacherButton>
+            <TeacherButton isForAdding={true} selected={excuseAbsence} onClick={onExcuseAbsence} width='15.85%'>Извинете Отсъствие</TeacherButton>
             <TeacherButton isForAdding={true} selected={addNewFeedback} onClick={onAddNewFeedback} width='32.5%'>Добавете Забележка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeMark} onClick={onRemoveMark} width='32.5%'>Премахнете Оценка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeAbsence} onClick={onRemoveAbsence} width='32.5%'>Премахнете Отсъствие</TeacherButton>
@@ -291,10 +326,13 @@ export function TeacherHomePage() {
                 removeMark && <RemoveMark updateData={(data) => setGradesData(data)} students={students} grades={gradesData} />
             }
             {
-                removeAbsence && <RemoveAbsence updateData={(data) => setAbsencesData(data)} students={students} absences={absencesData} ></RemoveAbsence>
+                removeAbsence && <RemoveAbsence updateData={(data) => setAbsencesData(data)} students={students} absences={absencesData} />
             }
             {
-                removeFeedback && <RemoveFeedback updateData={(data) => setFeedbacksData(data)} feedbacksData={feedbacksData}></RemoveFeedback>
+                excuseAbsence && <ExcuseAbsence updateData={(data) => setAbsencesData(data)} students={students} absences={absencesData} />
+            }
+            {
+                removeFeedback && <RemoveFeedback updateData={(data) => setFeedbacksData(data)} feedbacksData={feedbacksData} />
             }
             {
                 addNewMark && <AddNewMark updateData={(data) => setGradesData(data)} students={students} />
