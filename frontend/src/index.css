@@ -54,3 +54,15 @@ code {
 
   color: #fff;
 }
+
+#loginInput{
+  display: inline-block;
+}
+
+#loginIcon{
+  display: inline-block;
+}
+
+#loginButton{
+  border-radius: 19px;
+}

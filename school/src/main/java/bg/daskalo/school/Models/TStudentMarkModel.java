@@ -1,23 +1,43 @@
 package bg.daskalo.school.Models;
 
-public class StudentMarkModel {
-    private String subject;
+import java.util.ArrayList;
+
+public class TStudentMarkModel {
+    private ArrayList<Long> firstTermIds;
+    private ArrayList<Long> secondTermIds;
+    private String studentNames;
     private String firstTerm;
     private String firstTermFinal;
     private String secondTerm;
     private String secondTermFinal;
     private String yearly;
 
-    public StudentMarkModel(String subject) {
-        this.subject = subject;
+    public TStudentMarkModel(String studentNames) {
+        this.studentNames = studentNames;
     }
 
-    public String getSubject() {
-        return subject;
+    public ArrayList<Long> getFirstTermIds() {
+        return firstTermIds;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setFirstTermIds(ArrayList<Long> firstTermIds) {
+        this.firstTermIds = firstTermIds;
+    }
+
+    public ArrayList<Long> getSecondTermIds() {
+        return secondTermIds;
+    }
+
+    public void setSecondTermIds(ArrayList<Long> secondTermIds) {
+        this.secondTermIds = secondTermIds;
+    }
+
+    public String getStudentNames() {
+        return studentNames;
+    }
+
+    public void setStudentNames(String studentName) {
+        this.studentNames = studentName;
     }
 
     public String getFirstTerm() {

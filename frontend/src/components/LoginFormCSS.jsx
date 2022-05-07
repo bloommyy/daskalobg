@@ -7,7 +7,7 @@ export const FormContainer = styled.form`
 `;
 
 export const Input = styled.input`
-    width: 95%;
+    width: 100%;
     height: 42px;
     outline: none;
     border: 1.4px solid rgba(200, 200, 200, 0.4);
@@ -35,7 +35,7 @@ export const SubmitButton = styled.button`
     border-radius: 18px;
     cursor: pointer;
     transition: all, 240ms ease-in-out;
-    background: rgba(0, 21, 255, 0.68);
+    background: rgba(0, 21, 255, 0.88);
     margin: 2px 5px;
 
     &:hover {
@@ -49,11 +49,13 @@ export const BoxContainer = styled.div`
     min-height: 100px;
     display: flex;
     flex-direction: column;
+    border: double 5px transparent;
     border-radius: 19px;
-    border: 5px solid  rgba(0, 21, 255, 0.68);
-    box-shadow: 0 0 2px rgba(15, 15, 15, 0.28);
-    position: relative;
-    overflow: hidden;
+    background-image: linear-gradient(white, white), 
+                      linear-gradient(-45deg, purple, blue);
+    background-origin: border-box;
+    background-clip: content-box, border-box;
+    
 `;
 
 export const TopContainer = styled.div`

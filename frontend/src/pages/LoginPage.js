@@ -3,6 +3,8 @@ import { AppContainer, BoxContainer, TopContainer, HeaderContainer, HeaderText, 
 import { connect } from 'react-redux';
 import { login } from '../actions/auth';
 import MuiAlert from '@material-ui/lab/Alert';
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -31,8 +33,22 @@ export default connect(({ error }) => ({ error }), { login })(props => {
             </TopContainer>
             <InnerContainer>
                 <FormContainer>
-                    <Input type="email" onChange={e => setEmail(e.target.value)} placeholder="E-mail" />
-                    <Input type="password" onChange={e => setPassword(e.target.value)} placeholder="Парола" />
+                    <div id='loginEmail'>
+                        <div id='loginIcon'>
+                            <PersonIcon fontSize='large' />
+                        </div>
+                        <div id='loginInput'>
+                            <Input type="email" onChange={e => setEmail(e.target.value)} placeholder="E-mail" />
+                        </div>
+                    </div>
+                    <div>
+                        <div id='loginIcon'>
+                            <LockIcon fontSize='large' />
+                        </div>
+                        <div id='loginInput'>
+                            <Input type="password" onChange={e => setPassword(e.target.value)} placeholder="Парола" />
+                        </div>
+                    </div>
                 </FormContainer>
                 <SubmitButton type="submit" onClick={btnOnClick}>Влез</SubmitButton>
             </InnerContainer>

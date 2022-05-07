@@ -29,10 +29,6 @@ export function TeacherHomePage() {
     const [removeAbsence, setRemoveAbsence] = useState(false);
     const [removeFeedback, setRemoveFeedback] = useState(false);
 
-    const [marks, setMarks] = useState([]);
-
-    const [toRefresh, setToRefresh] = useState(true)
-
     var selectedClass = '';
 
     useEffect(() => {
@@ -68,9 +64,9 @@ export function TeacherHomePage() {
                     setAbsences(false);
                     setFeedback(false);
                     setGrades(true)
-                    setToRefresh(refresh => !refresh)
                 })
                 .catch(function (error) {
+                    console.log(error)
                     alert(error.response.data)
                     return;
                 })
@@ -83,7 +79,6 @@ export function TeacherHomePage() {
                     if (typeof response.data === 'undefined')
                         return;
 
-                    console.log("I WAS CALLED")
                     setAbsencesData(response.data);
                     setAbsences(false);
                     setGrades(false);
@@ -211,6 +206,12 @@ export function TeacherHomePage() {
                     setRemoveMark(!removeMark)
                     setRemoveAbsence(false)
                     setRemoveFeedback(false)
+                    if (!removeMark) {
+                        setGrades(true)
+                        setAbsences(false)
+                        setFeedback(false)
+                        onGrades()
+                    }
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -232,6 +233,12 @@ export function TeacherHomePage() {
                     setRemoveMark(false)
                     setRemoveAbsence(!removeAbsence)
                     setRemoveFeedback(false)
+                    if (!removeAbsence) {
+                        setGrades(false)
+                        setAbsences(true)
+                        setFeedback(false)
+                        onAbsences()
+                    }
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -255,6 +262,12 @@ export function TeacherHomePage() {
                     setRemoveMark(false)
                     setRemoveAbsence(false)
                     setRemoveFeedback(!removeFeedback)
+                    if (!removeFeedback) {
+                        setGrades(false)
+                        setAbsences(false)
+                        setFeedback(true)
+                        onFeedback()
+                    }
                 })
                 .catch(function (error) {
                     alert(error.response.data)
@@ -269,34 +282,34 @@ export function TeacherHomePage() {
             <Button onClick={onAbsences} width='32.5%' selected={absences}>Отсъствия</Button>
             <Button onClick={onFeedback} width='32.5%' selected={feedbacks}>Забележки</Button>
             <TeacherButton isForAdding={true} selected={addNewMark} onClick={onAddNewMark} width='32.5%'>Добавете Оценка</TeacherButton>
-            <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='32.5%'>Добавете Остъствие</TeacherButton>
+            <TeacherButton isForAdding={true} selected={addNewAbsence} onClick={onAddNewAbsence} width='32.5%'>Добавете Отсъствие</TeacherButton>
             <TeacherButton isForAdding={true} selected={addNewFeedback} onClick={onAddNewFeedback} width='32.5%'>Добавете Забележка</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeMark} onClick={onRemoveMark} width='32.5%'>Премахнете Оценка</TeacherButton>
-            <TeacherButton isForAdding={false} selected={removeAbsence} onClick={onRemoveAbsence} width='32.5%'>Премахнете Остъствие</TeacherButton>
+            <TeacherButton isForAdding={false} selected={removeAbsence} onClick={onRemoveAbsence} width='32.5%'>Премахнете Отсъствие</TeacherButton>
             <TeacherButton isForAdding={false} selected={removeFeedback} onClick={onRemoveFeedback} width='32.5%'>Премахнете Забележка</TeacherButton>
             {
-                removeMark && <RemoveMark hasToRefresh={onGrades} students={students} grades={gradesData} />
+                removeMark && <RemoveMark updateData={(data) => setGradesData(data)} students={students} grades={gradesData} />
             }
             {
-                removeAbsence && <RemoveAbsence hasToRefresh={onAbsences} students={students} absences={absencesData} ></RemoveAbsence>
+                removeAbsence && <RemoveAbsence updateData={(data) => setAbsencesData(data)} students={students} absences={absencesData} ></RemoveAbsence>
             }
             {
-                removeFeedback && <RemoveFeedback hasToRefresh={onFeedback} feedbacksData={feedbacksData}></RemoveFeedback>
+                removeFeedback && <RemoveFeedback updateData={(data) => setFeedbacksData(data)} feedbacksData={feedbacksData}></RemoveFeedback>
             }
             {
-                addNewMark && <AddNewMark hasToRefresh={onGrades} students={students} />
+                addNewMark && <AddNewMark updateData={(data) => setGradesData(data)} students={students} />
             }
             {
-                addNewAbsence && <AddNewAbsence hasToRefresh={onAbsences} students={students} />
+                addNewAbsence && <AddNewAbsence updateData={(data) => setAbsencesData(data)} students={students} />
             }
             {
-                addNewFeedback && <AddNewFeedback hasToRefresh={onFeedback} students={students} />
+                addNewFeedback && <AddNewFeedback updateData={(data) => setFeedbacksData(data)} students={students} />
             }
             {
-                grades && <GetTable refresh={toRefresh} prepData={gradesData} type={TableType.Grades} />
+                grades && <GetTable prepData={gradesData} type={TableType.Grades} />
             }
             {
-                absences && <GetStudentsAbsencesTable rawData={absencesData} />
+                absences && <GetTable prepData={absencesData} type={TableType.Absences} />
             }
             {
                 feedbacks && <GetTable prepData={feedbacksData} type={TableType.Feedbacks} />

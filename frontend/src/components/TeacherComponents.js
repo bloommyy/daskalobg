@@ -5,9 +5,8 @@ import "@progress/kendo-theme-default/dist/all.css";
 import axios from 'axios';
 import { useState } from 'react';
 import { timeConverter } from '../utils';
-import { MicNone } from '@mui/icons-material';
 
-export function AddNewMark({ students, hasToRefresh }) {
+export function AddNewMark({ students, updateData, addMark }) {
 
     var selectedPerson = '';
     var selectedMark = 0;
@@ -40,10 +39,10 @@ export function AddNewMark({ students, hasToRefresh }) {
 
     function addMark() {
 
-        let month = new Date().getMonth;
+        let month = new Date().getMonth();
         let term = 1;
 
-        if (month >= 1 && month <= 5)
+        if (month >= 1 && month <= 7)
             term = 2;
 
         if (selectedPerson === '' && selPerson === '') {
@@ -57,12 +56,13 @@ export function AddNewMark({ students, hasToRefresh }) {
         }
 
         axios.post('http://localhost:8080/teacher/mark/add?stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&mark=' + (selectedMark != 0 ? selectedMark : selMark) + '&teacherId=' + userJSON.id + '&term=' + term)
+            .then(function (response) {
+                updateData(response.data)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
-
-        hasToRefresh()
     }
 
     return (
@@ -76,7 +76,7 @@ export function AddNewMark({ students, hasToRefresh }) {
     )
 }
 
-export function AddNewAbsence({ students, hasToRefresh }) {
+export function AddNewAbsence({ students, updateData }) {
 
     var selectedPerson = '';
     var isAbsence = null;
@@ -119,12 +119,13 @@ export function AddNewAbsence({ students, hasToRefresh }) {
         }
 
         axios.post('http://localhost:8080/teacher/absence/add?&teacherId=' + userJSON.id + '&stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&isAbsence=' + (isAbsence !== null ? isAbsence : isAbs))
+            .then(function (response) {
+                updateData(response.data)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
-
-        hasToRefresh()
     }
 
     return (
@@ -138,7 +139,7 @@ export function AddNewAbsence({ students, hasToRefresh }) {
     )
 }
 
-export function AddNewFeedback({ students, hasToRefresh }) {
+export function AddNewFeedback({ students, updateData }) {
 
     var selectedPerson = '';
     var description = '';
@@ -179,12 +180,14 @@ export function AddNewFeedback({ students, hasToRefresh }) {
         }
 
         axios.post('http://localhost:8080/teacher/feedback/add?teacherId=' + userJSON.id + '&stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&description=' + (description !== '' ? description : desc))
+            .then(function (response) {
+                updateData(response.data)
+                console.log(response.data)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
-
-        hasToRefresh()
     }
 
     return (
@@ -198,7 +201,7 @@ export function AddNewFeedback({ students, hasToRefresh }) {
     )
 }
 
-export function RemoveMark({ hasToRefresh, grades }) {
+export function RemoveMark({ updateData, grades }) {
     var selectedPerson = '';
     var selectedMark = -1;
 
@@ -244,7 +247,6 @@ export function RemoveMark({ hasToRefresh, grades }) {
             alert("Не сте избрали ученик.")
             return;
         }
-        console.log(selectedMark, selMark)
         if (selectedMark === -1 && selMark === -1) {
             alert("Не сте избрали оценка.")
             return;
@@ -253,20 +255,24 @@ export function RemoveMark({ hasToRefresh, grades }) {
         let link = 'http://localhost:8080/teacher/mark/delete?teacherId=' + userJSON.id + '&id=' + (selMark.id === undefined ? selectedMark : selMark.id)
 
         axios.delete(link)
+            .then(function (response) {
+                updateData(response.data)
+
+                let temp = []
+                marks.map(function (item, index, array) {
+                    let id = selMark.id === undefined ? selectedMark : selMark.id
+                    if (id !== item.id)
+                        temp.push(item)
+                })
+
+                setMarks(temp)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
 
-        let temp = []
-        marks.map(function (item, index, array) {
-            let id = selMark.id === undefined ? selectedMark : selMark.id
-            if (id !== item.id)
-                temp.push(item)
-        })
 
-        setMarks(temp)
-        hasToRefresh();
     }
 
     return (
@@ -280,7 +286,7 @@ export function RemoveMark({ hasToRefresh, grades }) {
     )
 }
 
-export function RemoveAbsence({ hasToRefresh, absences }) {
+export function RemoveAbsence({ updateData, absences }) {
     var selectedPerson = '';
 
     const [selPerson, setSelPerson] = useState('');
@@ -297,8 +303,8 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
     })
 
     absencesData.map(function (item, index, array) {
-        if (!students.includes(item.studentName))
-            students.push(item.studentName)
+        if (!students.includes(item.studentNames))
+            students.push(item.studentNames)
     })
 
     function onPersonChange(value) {
@@ -315,8 +321,8 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
 
         let tempArr = []
         absences.map(function (item, index, array) {
-            if (item.studentName === value) {
-                tempArr.push({ date: timeConverter(item.date), id: item.id })
+            if (item.studentNames === value) {
+                tempArr.push({ date: item.date, id: item.id })
             }
         })
         setDates(tempArr)
@@ -338,12 +344,19 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
         }
 
         axios.delete('http://localhost:8080/teacher/absence/delete?teacherId=' + userJSON.id + '&id=' + selAbsence.id)
+            .then(function (response) {
+                updateData(response.data)
+                let temp = []
+                dates.map(function (item, index, array) {
+                    if (item.id != selAbsence.id)
+                        temp.push(item)
+                })
+                setDates(temp)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
-
-        hasToRefresh();
     }
 
     return (
@@ -357,10 +370,7 @@ export function RemoveAbsence({ hasToRefresh, absences }) {
     )
 }
 
-export function RemoveFeedback({ hasToRefresh, feedbacksData }) {
-
-    console.log(feedbacksData)
-
+export function RemoveFeedback({ updateData, feedbacksData }) {
     var selectedPerson = '';
 
     const [selPerson, setSelPerson] = useState('');
@@ -413,12 +423,13 @@ export function RemoveFeedback({ hasToRefresh, feedbacksData }) {
         }
 
         axios.delete('http://localhost:8080/teacher/feedback/delete?teacherId=' + userJSON.id + '&id=' + selFeedback.id)
+            .then(function (response) {
+                updateData(response.data)
+            })
             .catch(function (error) {
                 alert(error.response.data)
                 return;
             })
-
-        hasToRefresh();
     }
 
     return (

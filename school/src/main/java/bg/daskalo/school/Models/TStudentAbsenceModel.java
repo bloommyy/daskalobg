@@ -1,24 +1,34 @@
 package bg.daskalo.school.Models;
 
-public class StudentAbsenceModel {
-    private String subjectName;
+public class TStudentAbsenceModel {
+    private Long id;
+    private String studentNames;
     private String type;
     private String isExcused;
     private String date;
 
-    public StudentAbsenceModel(String subjectName, String type, String isExcused, String date) {
-        this.subjectName = subjectName;
+    public TStudentAbsenceModel(Long id, String studentNames, String type, String isExcused, String date) {
+        this.id = id;
+        this.studentNames = studentNames;
         this.type = type;
         this.isExcused = isExcused;
         this.date = date;
     }
 
-    public String getSubjectName() {
-        return subjectName;
+    public Long getId() {
+        return id;
     }
 
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getStudentNames() {
+        return studentNames;
+    }
+
+    public void setStudentNames(String studentNames) {
+        this.studentNames = studentNames;
     }
 
     public String getType() {

@@ -1,8 +1,9 @@
 import Nav from '../components/StudentAppNavBar';
 import { Button, Form } from '../components/HomePageCSS';
-import { GetMarksTable, GetAbsencesTable, GetFeedbacksTable } from '../components/Table';
+import { GetAbsencesTable, GetFeedbacksTable, GetTable } from '../components/Table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { TableType } from '../utils'
 
 export function StudentHomePage() {
     const [grades, setGrades] = useState(false);
@@ -13,21 +14,13 @@ export function StudentHomePage() {
     const [gradesData, setGradesData] = useState('');
     const [absencesData, setAbsencesData] = useState('');
     const [feedbacksData, setFeedbacksData] = useState('');
-    const [subjectsData, setSubjectsData] = useState(null);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
-        if (subjectsData === null)
-            axios.get('http://localhost:8080/subject/byClass?sjClass=' + userJSON.stClass.slice(0, -1))
-                .then(function (response) {
-                    if (typeof response.data === 'undefined')
-                        return;
-                    setSubjectsData(response.data);
-                    onGrades()
-                })
-                .catch(function (error) {
-                    alert(error.response.data)
-                    return;
-                })
+        if (!loaded) {
+            onGrades()
+            setLoaded(true)
+        }
     })
 
     function onGrades() {
@@ -35,6 +28,7 @@ export function StudentHomePage() {
             .then(function (response) {
                 if (typeof response.data === 'undefined')
                     return;
+
                 setGradesData(response.data)
                 setGrades(true);
                 setAbsences(false);
@@ -51,6 +45,7 @@ export function StudentHomePage() {
             .then(function (response) {
                 if (typeof response.data === 'undefined')
                     return;
+
                 setAbsencesData(response.data);
                 setGrades(false);
                 setAbsences(true);
@@ -83,13 +78,13 @@ export function StudentHomePage() {
             <Button onClick={onAbsences} width='32.5%' selected={absences}>Отсъствия</Button>
             <Button onClick={onFeedback} width='32.5%' selected={feedbacks}>Забележки</Button>
             {
-                grades && <GetMarksTable rawData={gradesData} subjects={subjectsData} />
+                grades && <GetTable prepData={gradesData} type={TableType.StudentGrades} />
             }
             {
-                absences && <GetAbsencesTable rawData={absencesData} />
+                absences && <GetTable prepData={absencesData} type={TableType.StudentAbsences} />
             }
             {
-                feedbacks && <GetFeedbacksTable rawData={feedbacksData} />
+                feedbacks && <GetTable prepData={feedbacksData} type={TableType.StudentFeedbacks} />
             }
         </Form>
     )

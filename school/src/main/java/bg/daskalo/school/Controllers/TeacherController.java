@@ -2,8 +2,12 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.*;
 import bg.daskalo.school.Entities.Login.TeacherLogin;
+import bg.daskalo.school.Models.TStudentAbsenceModel;
+import bg.daskalo.school.Models.TStudentFeedbackModel;
+import bg.daskalo.school.Models.TStudentMarkModel;
 import bg.daskalo.school.Payload.Request.PersistTeacherRequest;
 import bg.daskalo.school.Repositories.*;
+import bg.daskalo.school.Utils.HelpfulThings;
 import bg.daskalo.school.Utils.Security;
 import bg.daskalo.school.Utils.Validation;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -107,10 +113,13 @@ public class TeacherController {
             return new ResponseEntity<>("Mark is invalid.", HttpStatus.BAD_REQUEST);
 
         Mark addMark = markRepo.save(new Mark(student, teacher.getSubject(), mark, term));
-        return new ResponseEntity<>("Added mark " + addMark.getMark() +
-                " to " + addMark.getStudent().getFirstName()
-                + " " + addMark.getStudent().getMiddleName().charAt(0) + ". " +
-                addMark.getStudent().getLastName(), HttpStatus.CREATED);
+
+        String stClass = student.getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentMarkModel> studentMarkModels = HelpfulThings.ProcessMarks(students, teacher.getSubject());
+
+        return new ResponseEntity<>(studentMarkModels, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/mark/delete")
@@ -131,7 +140,12 @@ public class TeacherController {
 
         markRepo.delete(deleteMark);
 
-        return ResponseEntity.ok("Mark was deleted.");
+        String stClass = deleteMark.getStudent().getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentMarkModel> studentMarkModels = HelpfulThings.ProcessMarks(students, teacher.getSubject());
+
+        return ResponseEntity.ok(studentMarkModels);
     }
 
     @PostMapping("/feedback/add")
@@ -148,8 +162,14 @@ public class TeacherController {
         if (description == null)
             return new ResponseEntity<>("Enter a valid feedback.", HttpStatus.BAD_REQUEST);
 
-        Feedback addFeedback = feedbackRepo.save(new Feedback(student, new Date(), teacher.getSubject(), description));
-        return new ResponseEntity<>("Feedback : \"" + addFeedback.getDescription() + "\" saved successfully.", HttpStatus.CREATED);
+        feedbackRepo.save(new Feedback(student, new Date(), teacher.getSubject(), description));
+
+        String stClass = student.getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentFeedbackModel> studentMarkModels = HelpfulThings.ProcessFeedbacks(students, teacher.getSubject());
+
+        return new ResponseEntity<>(studentMarkModels, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/feedback/delete")
@@ -170,7 +190,12 @@ public class TeacherController {
 
         feedbackRepo.delete(deleteFeedback);
 
-        return ResponseEntity.ok("Feedback was deleted.");
+        String stClass = deleteFeedback.getStudent().getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentFeedbackModel> studentMarkModels = HelpfulThings.ProcessFeedbacks(students, teacher.getSubject());
+
+        return ResponseEntity.ok(studentMarkModels);
     }
 
     @PostMapping("/absence/add")
@@ -185,9 +210,14 @@ public class TeacherController {
             return new ResponseEntity<>("Teacher not found.", HttpStatus.BAD_REQUEST);
 
         Subject subject = teacher.getSubject();
-
         Absence addAbsence = absenceRepo.save(new Absence(student, new Date(), isAbsence, subject));
-        return new ResponseEntity<>("Absence given to " + addAbsence.getStudent().getFirstName() + ".", HttpStatus.CREATED);
+
+        String stClass = student.getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentAbsenceModel> studentAbsenceList = HelpfulThings.ProcessAbsences(students, subject);
+
+        return new ResponseEntity<>(studentAbsenceList, HttpStatus.CREATED);
     }
 
     @PostMapping("/absence/excuse")
@@ -234,7 +264,12 @@ public class TeacherController {
 
         absenceRepo.delete(deleteAbsence);
 
-        return ResponseEntity.ok("Absence was deleted.");
+        String stClass = deleteAbsence.getStudent().getStClass();
+        Set<Student> students = studentRepo.findStudentsByStClass(stClass);
+
+        List<TStudentAbsenceModel> studentAbsenceList = HelpfulThings.ProcessAbsences(students, teacher.getSubject());
+
+        return ResponseEntity.ok(studentAbsenceList);
     }
 
     @GetMapping("/classes")

@@ -12,4 +12,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     Subject findSubjectById(Long id);
 
     Subject findSubjectByNameAndSjClass(String name, String sjClass);
+
+    Set<Subject> findAllBySjClassOrderByName(String sjClass);
 }

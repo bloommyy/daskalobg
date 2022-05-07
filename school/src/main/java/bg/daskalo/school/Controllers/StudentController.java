@@ -2,9 +2,7 @@ package bg.daskalo.school.Controllers;
 
 import bg.daskalo.school.Entities.*;
 import bg.daskalo.school.Entities.Login.StudentLogin;
-import bg.daskalo.school.Models.StudentAbsenceModel;
-import bg.daskalo.school.Models.StudentFeedbackModel;
-import bg.daskalo.school.Models.StudentMarkModel;
+import bg.daskalo.school.Models.*;
 import bg.daskalo.school.Payload.Request.PersistStudentRequest;
 import bg.daskalo.school.Repositories.*;
 import bg.daskalo.school.Utils.HelpfulThings;
@@ -98,9 +96,55 @@ public class StudentController {
         if (st == null)
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
-        List<Mark> marks = st.getMarks();
+        ArrayList<StudentMarkModel> models = new ArrayList<>();
 
-        return ResponseEntity.ok(marks);
+        Set<Subject> subjects = subjectRepo.findAllBySjClassOrderByName(st.getStClass().substring(0, st.getStClass().length() - 1));
+        for (Subject sj : subjects) {
+            models.add(new StudentMarkModel(sj.getName()));
+        }
+
+        ArrayList<Mark> marks = new ArrayList<>(st.getMarks());
+        marks = HelpfulThings.ReverseList(marks);
+
+        for (Mark mark : marks) {
+            for (StudentMarkModel model : models) {
+                if (model.getSubject().equals(mark.getSubject().getName())) {
+                    if (mark.getTerm() == 1) {
+                        String firstTermMarks = model.getFirstTerm() == null ? "" : model.getFirstTerm();
+                        firstTermMarks += mark.getMark().toString();
+                        firstTermMarks += ", ";
+                        model.setFirstTerm(firstTermMarks);
+                    } else {
+                        String secondTermMarks = model.getSecondTerm() == null ? "" : model.getSecondTerm();
+                        secondTermMarks += mark.getMark().toString();
+                        secondTermMarks += ", ";
+                        model.setSecondTerm(secondTermMarks);
+                    }
+                    break;
+                }
+            }
+        }
+
+        for (StudentMarkModel model : models) {
+            model.setFirstTerm(HelpfulThings.FixString(model.getFirstTerm()));
+            model.setSecondTerm(HelpfulThings.FixString(model.getSecondTerm()));
+            model.setFirstTermFinal(HelpfulThings.Average(model.getFirstTerm()));
+            model.setSecondTermFinal(HelpfulThings.Average(model.getSecondTerm()));
+            String mark = model.getFirstTermFinal().replace(',', '.');
+            if (mark.isEmpty())
+                mark = "0";
+            double yearly = Double.parseDouble(mark);
+            mark = model.getSecondTermFinal().replace(',', '.');
+            if (mark.isEmpty()) {
+                model.setYearly("");
+                continue;
+            }
+            yearly += Double.parseDouble(mark);
+            yearly /= 2;
+            model.setYearly(String.valueOf(yearly));
+        }
+
+        return ResponseEntity.ok(models);
     }
 
     @GetMapping("/absences")
@@ -112,7 +156,15 @@ public class StudentController {
 
         List<Absence> absences = st.getAbsences();
 
-        return ResponseEntity.ok(absences);
+        ArrayList<StudentAbsenceModel> absenceModels = new ArrayList<>();
+        for (Absence abs : absences) {
+            absenceModels.add(new StudentAbsenceModel(abs.getSubject().getName(),
+                    (abs.isAbsence() ? "Отсъствие" : "Закъснение"),
+                    (abs.isExcused() ? "Да" : "Не"),
+                    HelpfulThings.TimeConvert(abs.getDate())));
+        }
+
+        return ResponseEntity.ok(absenceModels);
     }
 
     @GetMapping("/feedbacks")
@@ -123,8 +175,14 @@ public class StudentController {
             return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
         List<Feedback> feedbacks = st.getFeedbacks();
+        ArrayList<StudentFeedbackModel> feedbackModels = new ArrayList<>();
+        for (Feedback fb : feedbacks){
+            feedbackModels.add(new StudentFeedbackModel(fb.getSubject().getName(),
+                    fb.getDescription(),
+                    HelpfulThings.TimeConvert(fb.getDate())));
+        }
 
-        return ResponseEntity.ok(feedbacks);
+        return ResponseEntity.ok(feedbackModels);
     }
 
     @GetMapping("/marks/byClassAndSubject")
@@ -138,66 +196,7 @@ public class StudentController {
         if (subject == null)
             return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
 
-        List<StudentMarkModel> studentMarkList = new ArrayList<>();
-
-        int currStudent = 0;
-        for (Student student : students) {
-            studentMarkList.add(new StudentMarkModel(student.getFirstName() + " " + student.getMiddleName() + " " +
-                    student.getLastName()));
-
-            ArrayList<Integer> firstTermMarks = new ArrayList<>();
-            ArrayList<Integer> secondTermMarks = new ArrayList<>();
-            StudentMarkModel model =  studentMarkList.get(currStudent);
-            ArrayList<Long> firstTermIds = new ArrayList<>();
-            ArrayList<Long> secondTermIds = new ArrayList<>();
-            for (Mark mark : student.getMarks()) {
-                if(mark.getTerm() == 1){
-                    firstTermIds.add(mark.getId());
-                    firstTermMarks.add(mark.getMark());
-                }
-                else{
-                    secondTermIds.add(mark.getId());
-                    secondTermMarks.add(mark.getMark());
-                }
-            }
-            firstTermMarks = HelpfulThings.ReverseList(firstTermMarks);
-            secondTermMarks = HelpfulThings.ReverseList(secondTermMarks);
-            model.setFirstTermIds(HelpfulThings.ReverseList(firstTermIds));
-            model.setSecondTermIds(HelpfulThings.ReverseList(secondTermIds));
-
-            String firstTerm = firstTermMarks.toString();
-            model.setFirstTerm(firstTerm.substring(1, firstTerm.length()-1));
-
-            DecimalFormat df = new DecimalFormat();
-            df.setMaximumFractionDigits(2);
-
-            double sum = 0;
-            double firstTermDouble = 0;
-            double secondTermDouble = 0;
-            for (Integer mark : firstTermMarks)
-                sum += mark;
-
-            if (sum != 0){
-                firstTermDouble = sum/firstTermMarks.size();
-                model.setFirstTermFinal(df.format(firstTermDouble));
-            }
-
-            String secondTerm = secondTermMarks.toString();
-            model.setSecondTerm(secondTerm.substring(1, secondTerm.length()-1));
-
-            sum = 0;
-            for (Integer mark : secondTermMarks)
-                sum += mark;
-            if (sum != 0){
-                secondTermDouble = sum/secondTermMarks.size();
-                model.setSecondTermFinal(df.format(secondTermDouble));
-            }
-
-            if (secondTermDouble != 0)
-                model.setYearly(df.format((firstTermDouble + secondTermDouble) / 2));
-
-            currStudent++;
-        }
+        List<TStudentMarkModel> studentMarkList = HelpfulThings.ProcessMarks(students, subject);
 
         return ResponseEntity.ok(studentMarkList);
     }
@@ -208,25 +207,12 @@ public class StudentController {
         Subject subject = subjectRepo.findSubjectById(sjId);
 
         if (students != null & students.isEmpty())
-            return new ResponseEntity<>("Students not found.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Student not found.", HttpStatus.BAD_REQUEST);
 
         if (subject == null)
             return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
 
-        List<StudentAbsenceModel> studentAbsenceList = new ArrayList<>();
-
-        for (Student student : students) {
-            for (Absence absence : student.getAbsences()) {
-                if (absence.getSubject() == subject) {
-                    studentAbsenceList.add(new StudentAbsenceModel(
-                            absence.getId(),
-                            student.getFirstName() + " " + student.getMiddleName() + " " +
-                                    student.getLastName(),
-                            absence.isAbsence(), absence.isExcused(), absence.getDate()
-                    ));
-                }
-            }
-        }
+        List<TStudentAbsenceModel> studentAbsenceList = HelpfulThings.ProcessAbsences(students, subject);
 
         return ResponseEntity.ok(studentAbsenceList);
     }
@@ -242,20 +228,7 @@ public class StudentController {
         if (subject == null)
             return new ResponseEntity<>("Subject not found.", HttpStatus.BAD_REQUEST);
 
-        List<StudentFeedbackModel> studentFeedackList = new ArrayList<>();
-
-        for (Student student : students) {
-            for (Feedback feedback : student.getFeedbacks()) {
-                if (feedback.getSubject() == subject) {
-                    studentFeedackList.add(new StudentFeedbackModel(
-                            feedback.getId(),
-                            student.getFirstName() + " " + student.getMiddleName() + " " +
-                                    student.getLastName(),
-                            feedback.getDescription(), HelpfulThings.TimeConvert(feedback.getDate())
-                    ));
-                }
-            }
-        }
+        List<TStudentFeedbackModel> studentFeedackList = HelpfulThings.ProcessFeedbacks(students, subject);
 
         return ResponseEntity.ok(studentFeedackList);
     }

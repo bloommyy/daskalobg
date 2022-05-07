@@ -1,24 +1,22 @@
 package bg.daskalo.school.Models;
 
 public class StudentFeedbackModel {
-    private Long id;
-    private String studentName;
+    private String subjectName;
     private String description;
     private String date;
 
-    public StudentFeedbackModel(Long id, String studentName, String description, String date) {
-        this.id = id;
-        this.studentName = studentName;
+    public StudentFeedbackModel(String subjectName, String description, String date) {
+        this.subjectName = subjectName;
         this.description = description;
         this.date = date;
     }
 
-    public String getStudentName() {
-        return studentName;
+    public String getSubjectName() {
+        return subjectName;
     }
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
 
     public String getDescription() {
@@ -35,13 +33,5 @@ public class StudentFeedbackModel {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }
