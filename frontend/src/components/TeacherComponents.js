@@ -182,7 +182,6 @@ export function AddNewFeedback({ students, updateData }) {
         axios.post('http://localhost:8080/teacher/feedback/add?teacherId=' + userJSON.id + '&stId=' + (selectedPerson.id !== undefined ? selectedPerson.id : selPerson.id) + '&description=' + (description !== '' ? description : desc))
             .then(function (response) {
                 updateData(response.data)
-                console.log(response.data)
             })
             .catch(function (error) {
                 alert(error.response.data)
@@ -280,7 +279,7 @@ export function RemoveMark({ updateData, grades }) {
             <HeaderText>Изберете ученик</HeaderText>
             <DropDownMenu values={studentNames} onChange={onPersonChange} />
             <HeaderText>Изберете оценка</HeaderText>
-            <DropDownMenuSpecialized values={dates} type={DropDownType.Marks} onChange={onMarkChange} />
+            <DropDownMenuSpecialized values={marks} type={DropDownType.Marks} onChange={onMarkChange} />
             <SubmitButton isForDelete={true} onClick={removeMark}>Изтрий оценка</SubmitButton>
         </BoxContainer>
     )
@@ -504,12 +503,13 @@ export function ExcuseAbsence({ updateData, absences }) {
         let isExcused = false;
         dates.map(function (item, index, array) {
             absences.map(function (item1, index1, array1) {
-                if (item.id === item1.id)
+                if (item.id === item1.id) {
                     if (item1.type !== 'Отсъствие')
                         isAbsence = false;
 
-                if (item1.isExcused === 'Да')
-                    isExcused = true;
+                    if (item1.isExcused === 'Да')
+                        isExcused = true;
+                }
             })
         })
 

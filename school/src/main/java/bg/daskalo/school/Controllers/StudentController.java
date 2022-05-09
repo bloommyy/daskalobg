@@ -104,7 +104,6 @@ public class StudentController {
         }
 
         ArrayList<Mark> marks = new ArrayList<>(st.getMarks());
-        marks = HelpfulThings.ReverseList(marks);
 
         for (Mark mark : marks) {
             for (StudentMarkModel model : models) {

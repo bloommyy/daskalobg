@@ -6,7 +6,6 @@ const ABSENCES = 'date'
 const FEEDBACKS = 'description'
 
 export const DropDownMenuSpecialized = ({ values, type, onChange }) => {
-
     let field
     switch (type) {
         case DropDownType.Marks:

@@ -14,6 +14,7 @@ export default (
             localStorage.setItem("user", JSON.stringify(action.payload));
             return { ...state, isAuthUser: true, user: action.payload };
         case API_ERROR:
+            alert("Невалиден e-mail или парола.")
             return { ...state, error: action.payload }
         case LOGOUT:
             localStorage.removeItem("user");

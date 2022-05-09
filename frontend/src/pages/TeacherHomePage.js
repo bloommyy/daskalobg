@@ -66,7 +66,6 @@ export function TeacherHomePage() {
                     setGrades(true)
                 })
                 .catch(function (error) {
-                    console.log(error)
                     alert(error.response.data)
                     return;
                 })
